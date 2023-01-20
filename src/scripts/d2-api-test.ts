@@ -16,9 +16,12 @@ function main() {
         },
         handler: async args => {
             const api = new D2Api({ baseUrl: args.url });
-            const info = await api.system.info.getData();
             // const info = await api.system.info.getData();
-            console.debug(info.version);
+            const res = await api.models.dataSets.get({ 
+                fields: { id: true, displayName: true } 
+            })
+            .getData();
+            console.debug(res.objects);
         },
     });
 
