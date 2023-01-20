@@ -15,13 +15,13 @@ export interface User {
     disableUser(): boolean;
 }
 
-class UserInstance {
+export class UserInstance {
     id: string;
     name: string;
     username: string;
     disabled: boolean;
     lastDisabledUpdated: Date | undefined;
-    userRoles: UserRoleInstance;
+    userRoles: UserRoleInstance[];
     userGroups: NamedRef[];
 
     constructor(
@@ -29,7 +29,7 @@ class UserInstance {
         name: string,
         username: string,
         disabled: boolean,
-        userRoles: UserRoleInstance,
+        userRoles: UserRoleInstance[],
         userGroups: NamedRef[],
         lastDisabledUpdated?: Date
     ) {
@@ -42,19 +42,20 @@ class UserInstance {
         this.userGroups = userGroups;
     }
 
-    getDisabledDays(): number {
+    getDisabledDays(): number | undefined {
         if (this.disabled && this.lastDisabledUpdated) {
             return Math.floor((new Date().getTime() - this.lastDisabledUpdated.getTime()) / (1000 * 3600 * 24));
         } else {
-            return 0;
+            return undefined;
         }
     }
 
     isAdmin(): boolean {
-        return this.userRoles.isAdmin();
+        return _.some(this.userRoles, role => role.isAdmin());
     }
+
     disableUser(): boolean {
-        if (this.userRoles.isAdmin()) {
+        if (!this.isAdmin()) {
             this.disabled = true;
             this.lastDisabledUpdated = new Date();
         }
