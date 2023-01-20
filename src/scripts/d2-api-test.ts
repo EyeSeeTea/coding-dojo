@@ -17,11 +17,22 @@ function main() {
         handler: async args => {
             const api = new D2Api({ baseUrl: args.url });
             // const info = await api.system.info.getData();
-            const res = await api.models.dataSets.get({ 
-                fields: { id: true, displayName: true } 
-            })
-            .getData();
-            console.debug(res.objects);
+            const res = await api.models.dataSets
+                .get({
+                    fields: {
+                        id: true,
+                        name: true,
+                        createdBy: {
+                            name: true,
+                        },
+                        userGroupAccesses: {
+                            displayName: true,
+                        }
+                    },
+                })
+                .getData();
+            const names = res.objects.map(dataSet => dataSet.createdBy);
+            console.debug(names);
         },
     });
 
