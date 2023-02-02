@@ -85,3 +85,10 @@ The file `src/contexts/app-context.ts` holds some general context so typical inf
 ### Scripts
 
 Check the example script, entry `"script-example"`in `package.json`->scripts and `src/scripts/example.ts`.
+
+### Coding Dojo - Demeter Law Session 1
+#### Task
+- Add to User:
+    - disabled property
+    - admin role (cant be disabled)
+    - nº of days disabled
