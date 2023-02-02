@@ -16,20 +16,30 @@ function main() {
         },
         handler: async args => {
             const api = new D2Api({ baseUrl: args.url });
+            let formattedOrgUnits: string[] = [];
+            let i = 1;
+            let orgUnits;
             //Get all orgUnits and show [ID] NAME (CODE)
-            const info = await api.models.organisationUnits
-                .get({
-                    pageSize: 50,
-                    fields: {
-                        id: true,
-                        name: true,
-                        code: true,
-                    },
-                })
-                .getData();
-            const formattedOrgUnits = info.objects.map(
-                orgUnits => `[${orgUnits.id}] ${orgUnits.name} (${orgUnits.code})`
-            );
+            do {
+                orgUnits = await api.models.organisationUnits
+                    .get({
+                        pageSize: 50,
+                        page: i,
+                        fields: {
+                            id: true,
+                            name: true,
+                            code: true,
+                        },
+                    })
+                    .getData();
+
+                const currentOrgUnitPage = orgUnits.objects.map(
+                    orgUnits => `[${orgUnits.id}] ${orgUnits.name} (${orgUnits.code})`
+                );
+
+                formattedOrgUnits = [...formattedOrgUnits, ...currentOrgUnitPage];
+                i++;
+            } while (orgUnits?.objects?.length > 0);
             console.debug(formattedOrgUnits);
         },
     });
