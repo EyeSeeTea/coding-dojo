@@ -28,11 +28,11 @@ function main() {
                         },
                         userGroupAccesses: {
                             displayName: true,
-                        }
+                        },
                     },
                     filter: {
-                        name: { eq: "Population" }
-                    }
+                        name: { eq: "Population" },
+                    },
                 })
                 .getData();
             const names = res.objects.map(dataSet => dataSet.name);
