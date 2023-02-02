@@ -19,6 +19,7 @@ function main() {
             // const info = await api.system.info.getData();
             const res = await api.models.dataSets
                 .get({
+                    page: 1,
                     fields: {
                         id: true,
                         name: true,
@@ -29,9 +30,12 @@ function main() {
                             displayName: true,
                         }
                     },
+                    filter: {
+                        name: { eq: "Population" }
+                    }
                 })
                 .getData();
-            const names = res.objects.map(dataSet => dataSet.createdBy);
+            const names = res.objects.map(dataSet => dataSet.name);
             console.debug(names);
         },
     });
