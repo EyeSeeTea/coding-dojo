@@ -97,13 +97,14 @@
         "prettify": "prettier \"./**/*.{js,jsx,json,css,ts,tsx}\" --write",
         "extract-pot": "yarn d2-i18n-extract -p src/ -o i18n/",
         "localize": "yarn update-po && d2-i18n-generate -n dhis2-skeleton-app -p ./i18n/ -o ./src/locales/",
-        "update-po": "yarn extract-pot && find i18n/ -name '*.po' -exec msgmerge --backup=off -U {} i18n/en.pot \\;",
+        "update-po": "yarn extract-pot",
         "manifest": "d2-manifest package.json build/manifest.webapp",
         "cy:verify": "cypress verify",
         "cy:e2e:open": "NODE_ENV=test CYPRESS_E2E=true cypress open",
         "cy:e2e:run": "NODE_ENV=test CYPRESS_E2E=true cypress run --browser chrome",
         "prepare": "husky install",
-        "script-example": "npx ts-node src/scripts/example.ts"
+        "script-example": "npx ts-node src/scripts/example.ts",
+        "script-ex-1": "npx ts-node src/scripts/d2-api-tests.ts"
     },
     "manifest.webapp": {
         "name": "DHIS2 Skeleton App",
