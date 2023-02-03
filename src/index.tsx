@@ -8,6 +8,7 @@ import { Instance } from "./data/entities/Instance";
 import { getD2APiFromInstance } from "./utils/d2-api";
 import { App } from "./webapp/pages/app/App";
 import { D2Api } from "./types/d2-api";
+import { tests } from "./domain/entities/User.test";
 
 declare global {
     interface Window {
@@ -72,3 +73,5 @@ async function main() {
 }
 
 main();
+
+tests();
