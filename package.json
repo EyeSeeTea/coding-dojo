@@ -104,7 +104,8 @@
         "cy:e2e:run": "NODE_ENV=test CYPRESS_E2E=true cypress run --browser chrome",
         "prepare": "husky install",
         "script-example": "npx ts-node src/scripts/example.ts",
-        "script-ex-1": "npx ts-node src/scripts/d2-api-tests.ts"
+        "script-ex-1": "npx ts-node src/scripts/d2-api-tests.ts",
+        "ex-2": "npx ts-node src/scripts/ex-2.ts -u https://admin:district@dev.eyeseetea.com/play"
     },
     "manifest.webapp": {
         "name": "DHIS2 Skeleton App",
