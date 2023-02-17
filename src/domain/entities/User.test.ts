@@ -35,7 +35,7 @@ describe("User", () => {
         const user = makeUser(nonAdminProps);
 
         expect(user.isDisabled()).toBe(false);
-        expect(user.getDaysDisabled()).toBe(null);
+        expect(user.getDaysDisabled()).toBe(undefined);
     });
     it("shouldn't be disabled if disabled is false", () => {
         expect.assertions(2);
@@ -44,7 +44,7 @@ describe("User", () => {
         const user = makeUser(nonAdminProps);
 
         expect(user.isDisabled()).toBe(false);
-        expect(user.getDaysDisabled()).toBe(null);
+        expect(user.getDaysDisabled()).toBe(undefined);
     });
     it("should be disabled if disabled is true and not admin", () => {
         expect.assertions(2);
