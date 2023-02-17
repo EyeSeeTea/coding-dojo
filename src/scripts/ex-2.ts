@@ -41,6 +41,24 @@ function main() {
 
             const result = await api.metadata.post({ dataSets: updatedDatasets }).getData();
             console.info(`Dataset Update status : ${result.status}, stats: ${JSON.stringify(result.stats)} `);
+
+            /*Do the same with curl
+            1. Get the first dataset with curl and save to a local file
+            curl "https://admin:district@dev.eyeseetea.com/play/api/dataSets.json?pageSize=1&fields=id,name,displayName,indicators,periodType" | jq > curl_results\firstdataset.json
+
+            2.Manually update the json file with required changes
+            curl "https://admin:district@dev.eyeseetea.com/play/api/indicators.json" | jq
+
+            3. Post the changes via curl
+             curl -H "Content-Type: application/json" -d @curl_results\firstdataset.json -X PUT https://admin:district@dev.eyeseetea.com/play/api/dataSets/lyLU2wR22tC | jq
+
+
+            !!!! Unable to do batch update with curl - "httpStatus": "Method Not Allowed",
+            curl "https://admin:district@dev.eyeseetea.com/play/api/dataSets.json?pageSize=10&fields=id,name,displayName,indicators,periodType" | jq > curl_results\first10Datasets.json
+            update the json file with required changes
+            curl -H "Content-Type: application/json" -d @curl_results\first10Datasets.json -X PUT https://admin:district@dev.eyeseetea.com/play/api/dataSets | jq
+
+            */
         },
     });
 
