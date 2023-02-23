@@ -54,10 +54,13 @@ export class UserInstance {
         return _.some(this.userRoles, role => role.isAdmin());
     }
 
-    disableUser(): boolean {
+    disableUser(date?: Date): boolean {
+        if (date === undefined) {
+            date = new Date();
+        }
         if (!this.isAdmin()) {
             this.disabled = true;
-            this.lastDisabledUpdated = new Date();
+            this.lastDisabledUpdated = date;
         }
         return this.disabled;
     }
