@@ -20,9 +20,9 @@ export class UserInstance {
     name: string;
     username: string;
     disabled: boolean;
-    lastDisabledUpdated: Date | undefined;
-    userRoles: UserRoleInstance[];
-    userGroups: NamedRef[];
+    private lastDisabledUpdated: Date | undefined;
+    private userRoles: UserRoleInstance[];
+    private userGroups: NamedRef[];
 
     constructor(
         id: string,
