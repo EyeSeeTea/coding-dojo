@@ -1,7 +1,7 @@
 import { UserInstance, UserRoleInstance } from "./User";
 
 export function getNewUser() {}
-describe("findOrCreate method", () => {
+describe("User", () => {
     it("should disable normal user when disableUser is called", async () => {
         //given
         const normalUser = getNormalUser();
@@ -24,7 +24,7 @@ describe("findOrCreate method", () => {
         expect(normalUser.disabled).toEqual(false);
     });
 
-    it("should return a date when a normal user is disabled", async () => {
+    it("should return the disabled days when a normal user is disabled", async () => {
         //given
         const normalUser = getNormalUser();
 
