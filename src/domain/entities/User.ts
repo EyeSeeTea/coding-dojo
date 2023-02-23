@@ -14,10 +14,10 @@ export class UserModel {
     id: string;
     name: string;
     username: string;
-    userRoles: UserRole[];
-    userGroups: NamedRef[];
-    isActive: boolean;
-    disabledDate?: Date;
+    private userRoles: UserRole[];
+    private userGroups: NamedRef[];
+    private isActive: boolean;
+    private disabledDate?: Date;
 
     constructor({ id, name, username, userRoles, userGroups }: User) {
         this.id = id;
@@ -32,10 +32,10 @@ export class UserModel {
         return _.some(this.userRoles, ({ authorities }) => authorities.includes("ALL"));
     };
 
-    disable = (): void => {
+    disable = (date?: Date): void => {
         if (!this.isAdmin()) {
             this.isActive = false;
-            this.disabledDate = new Date();
+            this.disabledDate = date || new Date();
         }
     };
 
@@ -43,8 +43,12 @@ export class UserModel {
         return !this.isActive;
     };
 
-    getDisabledDaysCount = (): number => {
-        return dayjs().diff(this.disabledDate, "days");
+    getDisabledDaysCount = (): number | undefined => {
+        if (this.disabledDate) {
+            return dayjs().diff(this.disabledDate, "days");
+        } else {
+            return undefined;
+        }
     };
 }
 
