@@ -1,8 +1,7 @@
-import _ from "lodash";
 import { NamedRef } from "./Ref";
 import { boolean } from "purify-ts";
 
-export interface User {
+export interface UserData {
     id: string;
     name: string;
     username: string;
@@ -71,6 +70,30 @@ export interface UserRole extends NamedRef {
     isAdmin(): boolean;
 }
 
+export class User {
+    public readonly id: string;
+    public readonly name: string;
+    public readonly username: string;
+
+    private readonly userGroups: NamedRef[];
+    private readonly userRoles: UserRole[];
+
+    constructor(data: UserData) {
+        this.id = data.id;
+        this.name = data.name;
+        this.username = data.username;
+        this.userRoles = data.userRoles;
+        this.userGroups = data.userGroups;
+    }
+
+    belongToUserGroup(userGroupUid: string): boolean {
+        return this.userGroups.some(({ id }) => id === userGroupUid);
+    }
+
+    isAdmin(): boolean {
+        return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
+    }
+}
 export class UserRoleInstance implements UserRole {
     name: string;
     id: string;
