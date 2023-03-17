@@ -1,6 +1,5 @@
 import _ from "lodash";
 import { NamedRef } from "./Ref";
-import { boolean } from "purify-ts";
 
 export interface UserData {
     id: string;
