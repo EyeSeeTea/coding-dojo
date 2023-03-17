@@ -1,4 +1,4 @@
-import { User, UserProps } from "./User";
+import { User, UserProps } from "../User";
 import { describe, expect, it } from "@jest/globals";
 
 const nonAdminProps: UserProps = {
@@ -19,17 +19,46 @@ const adminProps: UserProps = {
     disabled: undefined,
 };
 
+// make user
 describe("User", () => {
     it("should be admin if has authority ALL", () => {
         const user = makeUser(adminProps);
 
         expect(user.isAdmin()).toBe(true);
     });
+});
+describe("User", () => {
     it("shouldn't be admin if hasn't authority ALL", () => {
         const user = makeUser(nonAdminProps);
 
         expect(user.isAdmin()).toBe(false);
     });
+});
+
+// make user - disabled
+describe("User", () => {
+    it("creation should not fail if is disabled and is admin", () => {
+        adminProps.disabled = false;
+
+        const test = () => {
+            makeUser(adminProps);
+        };
+
+        expect(test).not.toThrow("Admins users can't be disabled");
+    });
+});
+describe("User", () => {
+    it("should fail if disabled is true and admin", () => {
+        adminProps.disabled = true;
+
+        const test = () => {
+            makeUser(adminProps);
+        };
+
+        expect(test).toThrow("Admins users can't be disabled");
+    });
+});
+describe("User", () => {
     it("shouldn't be disabled if disabled is undefined", () => {
         expect.assertions(2);
         const user = makeUser(nonAdminProps);
@@ -37,6 +66,8 @@ describe("User", () => {
         expect(user.isDisabled()).toBe(false);
         expect(user.getDaysDisabled()).toBe(undefined);
     });
+});
+describe("User", () => {
     it("shouldn't be disabled if disabled is false", () => {
         expect.assertions(2);
         nonAdminProps.disabled = false;
@@ -46,6 +77,8 @@ describe("User", () => {
         expect(user.isDisabled()).toBe(false);
         expect(user.getDaysDisabled()).toBe(undefined);
     });
+});
+describe("User", () => {
     it("should be disabled if disabled is true and not admin", () => {
         expect.assertions(2);
         nonAdminProps.disabled = true;
@@ -55,22 +88,43 @@ describe("User", () => {
         expect(user.isDisabled()).toBe(true);
         expect(user.getDaysDisabled()).toBe(0);
     });
-    it("disabled timestamp should be older than present", () => {
+});
+
+// timestamp
+describe("User", () => {
+    it("should be disabled and the timestamp be unaltered if user already disabled and not admin", () => {
         jest.useFakeTimers().setSystemTime(new Date("2023-01-01"));
         nonAdminProps.disabled = true;
-        try {
-            makeUser(nonAdminProps);
-        } catch (error) {
-            expect(error).toHaveProperty("message", "Time travel not yet possible");
-        }
+
+        const user = makeUser(nonAdminProps);
+        user.setDisabled(true);
+
+        expect(user.getDaysDisabled()).toBe(0);
     });
-    it("should fail if disabled is true and admin", () => {
-        adminProps.disabled = true;
-        try {
-            makeUser(adminProps);
-        } catch (error) {
-            expect(error).toHaveProperty("message", "Admins users can't be disabled");
-        }
+});
+describe("User", () => {
+    it("that is disabled should have an accuarate timestamp", () => {
+        jest.useFakeTimers().setSystemTime(new Date("2023-02-18"));
+        nonAdminProps.disabled = true;
+
+        const user = makeUser(nonAdminProps);
+        jest.useRealTimers();
+
+        expect(user.getDaysDisabled()).toBe(2);
+    });
+});
+describe("User", () => {
+    it("disabled timestamp should be older than present", () => {
+        jest.useFakeTimers().setSystemTime(new Date("2040-01-01"));
+        nonAdminProps.disabled = true;
+
+        const user = makeUser(nonAdminProps);
+        jest.useRealTimers();
+        const test = () => {
+            user.getDaysDisabled();
+        };
+
+        expect(test).toThrow("disabledTimestamp is newer than present");
     });
 });
 

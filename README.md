@@ -86,9 +86,13 @@ The file `src/contexts/app-context.ts` holds some general context so typical inf
 
 Check the example script, entry `"script-example"`in `package.json`->scripts and `src/scripts/example.ts`.
 
-### Coding Dojo - Demeter Law Session 1
+### Coding Dojo - Demeter Law Sessions
 #### Task
-- Add to User:
-    - disabled property
-    - admin role (cant be disabled)
-    - nº of days disabled
+- We need model users
+- The users can have roles and the roles can have authorities
+- An user can be Admin
+  - An user is Admin when it has an user role with an ALL authority 
+  - An user can be disabled 
+  - An admin user can not be disabled
+  - We should be able to know if a user is disabled and disabled days count
+Create unit tests for requirements

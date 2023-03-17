@@ -58,7 +58,7 @@ export class User {
     getDaysDisabled(): number | undefined {
         if (!this.disabledTimestamp) return undefined;
         const now = Date.now();
-        if (now < this.disabledTimestamp) throw new Error("Time travel not yet possible");
-        return Math.ceil(Math.abs(Date.now() - this.disabledTimestamp) / 86400000);
+        if (now < this.disabledTimestamp) throw new Error("disabledTimestamp is newer than present");
+        return Math.floor(Math.abs(now - this.disabledTimestamp) / 86400000);
     }
 }
