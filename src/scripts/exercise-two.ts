@@ -66,7 +66,7 @@ function main() {
             // curl -H 'Content-Type: application/json' \
             //   -d @datasets.json  \
             //   -X POST \
-            //   https://admin:district@dev.eyeseetea.com/play/api/dataSets | jq > response.json
+            //   https://admin:district@dev.eyeseetea.com/play/api/metadata | jq > response.json
         },
     });
 
