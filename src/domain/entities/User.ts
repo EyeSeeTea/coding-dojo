@@ -1,8 +1,7 @@
-import _ from "lodash";
 import { NamedRef } from "./Ref";
 import dayjs from "dayjs";
 
-export interface User {
+export interface UserData {
     id: string;
     name: string;
     username: string;
@@ -10,27 +9,37 @@ export interface User {
     userGroups: NamedRef[];
 }
 
-export class UserModel {
-    id: string;
-    name: string;
-    username: string;
-    private userRoles: UserRole[];
-    private userGroups: NamedRef[];
+export interface UserRole extends NamedRef {
+    authorities: string[];
+}
+
+export class User {
+    public readonly id: string;
+    public readonly name: string;
+    public readonly username: string;
+
+    private readonly userGroups: NamedRef[];
+    private readonly userRoles: UserRole[];
+
     private isActive: boolean;
     private disabledDate?: Date;
 
-    constructor({ id, name, username, userRoles, userGroups }: User) {
-        this.id = id;
-        this.name = name;
-        this.username = username;
-        this.userRoles = userRoles;
-        this.userGroups = userGroups;
+    constructor(data: UserData) {
+        this.id = data.id;
+        this.name = data.name;
+        this.username = data.username;
+        this.userRoles = data.userRoles;
+        this.userGroups = data.userGroups;
         this.isActive = true;
     }
 
-    isAdmin = (): boolean => {
-        return _.some(this.userRoles, ({ authorities }) => authorities.includes("ALL"));
-    };
+    belongToUserGroup(userGroupUid: string): boolean {
+        return this.userGroups.some(({ id }) => id === userGroupUid);
+    }
+
+    isAdmin(): boolean {
+        return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
+    }
 
     disable = (date?: Date): void => {
         if (!this.isAdmin()) {
@@ -50,8 +59,4 @@ export class UserModel {
             return undefined;
         }
     };
-}
-
-export interface UserRole extends NamedRef {
-    authorities: string[];
 }
