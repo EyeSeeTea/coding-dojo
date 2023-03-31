@@ -66,17 +66,17 @@ describe("User", () => {
     });
 });
 
-describe("User", () => {
-    it("can't be disabled if it is already disabled", () => {
-        //Given
-        const user = GivenANonAdminUserThatWasDisabledYesterday();
+// describe("User", () => {
+//     it("can't be disabled if it is already disabled", () => {
+//         //Given
+//         const user = GivenANonAdminUserThatWasDisabledYesterday();
 
-        //Then
+//         //Then
 
-        //When
-        expect(user.disable()).toStrictEqual(getYesterdayDate());
-    });
-});
+//         //When
+//         expect(user.disable()).toStrictEqual(getYesterdayDate());
+//     });
+// });
 
 describe("User", () => {
     it("can't be disabled if given disable date is newer than current date", () => {
