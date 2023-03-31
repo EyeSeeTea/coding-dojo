@@ -5,13 +5,10 @@ export interface UserData {
     id: string;
     name: string;
     username: string;
-    disabled: boolean;
-    lastDisabledUpdated: Date | undefined;
-    userRoles: UserRole[];
-    userGroups: NamedRef[];
-    getDisabledDays(): number;
-    isAdmin(): boolean;
-    disableUser(): boolean;
+    disabled?: boolean | undefined;
+    lastDisabledUpdated?: Date | undefined;
+    userRoles?: UserRole[] | undefined;
+    userGroups?: NamedRef[] | undefined;
 }
 
 export class UserInstance {
@@ -20,8 +17,8 @@ export class UserInstance {
     username: string;
     disabled: boolean;
     private lastDisabledUpdated: Date | undefined;
-    private userRoles: UserRoleInstance[];
-    private userGroups: NamedRef[];
+    private userRoles: UserRoleInstance[] | undefined;
+    private userGroups: NamedRef[] | undefined;
 
     constructor(
         id: string,
@@ -66,6 +63,8 @@ export class UserInstance {
 }
 
 export interface UserRole extends NamedRef {
+    id: string;
+    name: string;
     authorities: string[];
     isAdmin(): boolean;
 }
@@ -75,8 +74,8 @@ export class User {
     public readonly name: string;
     public readonly username: string;
 
-    private readonly userGroups: NamedRef[];
-    private readonly userRoles: UserRole[];
+    private readonly userGroups: NamedRef[] | undefined;
+    private readonly userRoles?: UserRole[] | undefined;
 
     constructor(data: UserData) {
         this.id = data.id;
@@ -87,11 +86,18 @@ export class User {
     }
 
     belongToUserGroup(userGroupUid: string): boolean {
-        return this.userGroups.some(({ id }) => id === userGroupUid);
+        if (this.userGroups == undefined) {
+            return false;
+        }
+        return this.userGroups?.some(({ id }) => id === userGroupUid);
     }
 
     isAdmin(): boolean {
-        return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
+        if (this.userRoles == undefined) {
+            return true;
+        } else {
+            return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
+        }
     }
 }
 export class UserRoleInstance implements UserRole {

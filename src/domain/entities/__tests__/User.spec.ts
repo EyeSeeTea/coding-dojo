@@ -54,8 +54,8 @@ function createUserWithGroups(userGroups: NamedRef[] = []): User {
         id: "YjJdEO6d38H",
         name: "Example test",
         username: "example",
-        userRoles: [],
-        userGroups,
+        userRoles: undefined,
+        userGroups: userGroups,
     });
 }
 
@@ -64,7 +64,7 @@ function createUser(userRoles: UserRole[], userGroups: NamedRef[] = []): User {
         id: "YjJdEO6d38H",
         name: "Example test",
         username: "example",
-        userRoles,
-        userGroups,
+        userRoles: userRoles,
+        userGroups: userGroups,
     });
 }

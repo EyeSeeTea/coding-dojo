@@ -1,5 +1,5 @@
 import { FutureData } from "../../domain/entities/Future";
-import { User } from "../../domain/entities/User";
+import { User, UserInstance } from "../../domain/entities/User";
 import { UserRepository } from "../../domain/repositories/UserRepository";
 import { D2Api, MetadataPick } from "../../types/d2-api";
 import { apiToFuture } from "../../utils/futures";
@@ -19,8 +19,8 @@ export class UserD2Repository implements UserRepository {
         return new User({
             id: d2User.id,
             name: d2User.displayName,
+            username: d2User.userCredentials.username,
             userGroups: d2User.userGroups,
-            ...d2User.userCredentials,
         });
     }
 }
