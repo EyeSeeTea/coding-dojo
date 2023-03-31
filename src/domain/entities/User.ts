@@ -6,6 +6,7 @@ export interface UserData {
     username: string;
     userRoles: UserRole[];
     userGroups: NamedRef[];
+    isDisabled: boolean;
 }
 
 export interface UserRole extends NamedRef {
@@ -19,6 +20,7 @@ export class User {
 
     private readonly userGroups: NamedRef[];
     private readonly userRoles: UserRole[];
+    private readonly isDisabled: boolean;
 
     constructor(data: UserData) {
         this.id = data.id;
@@ -26,6 +28,7 @@ export class User {
         this.username = data.username;
         this.userRoles = data.userRoles;
         this.userGroups = data.userGroups;
+        this.isDisabled = data.isDisabled;
     }
 
     belongToUserGroup(userGroupUid: string): boolean {
@@ -33,6 +36,11 @@ export class User {
     }
 
     isAdmin(): boolean {
-        return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
+        const hasAuthorities = this.userRoles.some(
+            ({ authorities }) => authorities.includes("ALL") && authorities.includes("F_METADATA_IMPORT")
+        );
+        const isInAdminUserGroup = this.userGroups.some(({ name }) => name === "Administrators");
+
+        return hasAuthorities && isInAdminUserGroup && !this.isDisabled;
     }
 }

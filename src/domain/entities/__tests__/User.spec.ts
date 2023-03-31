@@ -56,6 +56,7 @@ function createUserWithGroups(userGroups: NamedRef[] = []): User {
         username: "example",
         userRoles: [],
         userGroups,
+        isDisabled: false,
     });
 }
 
@@ -66,5 +67,6 @@ function createUser(userRoles: UserRole[], userGroups: NamedRef[] = []): User {
         username: "example",
         userRoles,
         userGroups,
+        isDisabled: false,
     });
 }
