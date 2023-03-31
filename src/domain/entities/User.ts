@@ -66,7 +66,6 @@ export interface UserRole extends NamedRef {
     id: string;
     name: string;
     authorities: string[];
-    isAdmin(): boolean;
 }
 
 export class User {
@@ -94,7 +93,7 @@ export class User {
 
     isAdmin(): boolean {
         if (this.userRoles == undefined) {
-            return true;
+            return false;
         } else {
             return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
         }
