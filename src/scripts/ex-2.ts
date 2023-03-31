@@ -38,6 +38,7 @@ function main() {
                 datasets.indicators = [...datasets.indicators, ANC1CoverageId];
                 return datasets;
             });
+            debugger;
 
             const result = await api.metadata.post({ dataSets: updatedDatasets }).getData();
             console.info(`Dataset Update status : ${result.status}, stats: ${JSON.stringify(result.stats)} `);
@@ -53,11 +54,13 @@ function main() {
              curl -H "Content-Type: application/json" -d @curl_results\firstdataset.json -X PUT https://admin:district@dev.eyeseetea.com/play/api/dataSets/lyLU2wR22tC | jq
 
 
-            !!!! Unable to do batch update with curl - "httpStatus": "Method Not Allowed",
-            curl "https://admin:district@dev.eyeseetea.com/play/api/dataSets.json?pageSize=10&fields=id,name,displayName,indicators,periodType" | jq > curl_results\first10Datasets.json
-            update the json file with required changes
-            curl -H "Content-Type: application/json" -d @curl_results\first10Datasets.json -X PUT https://admin:district@dev.eyeseetea.com/play/api/dataSets | jq
+            //Batch Update
 
+            1. curl "https://admin:district@dev.eyeseetea.com/play/api/dataSets.json?pageSize=10&fields=id,name,displayName,indicators,periodType" | jq > curl_results\first10Datasets.json
+            2. update the json file with required changes
+
+            FIX for batch update with curl : use method POST and endpoint metadata
+            3. curl -H "Content-Type: application/json" -d @curl_results\first10Datasets.json -X POST https://admin:district@dev.eyeseetea.com/play/api/metadata | jq
             */
         },
     });
