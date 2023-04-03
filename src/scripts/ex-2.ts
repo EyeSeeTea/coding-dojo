@@ -38,10 +38,8 @@ function main() {
                 datasets.indicators = [...datasets.indicators, ANC1CoverageId];
                 return datasets;
             });
-            debugger;
-
             const result = await api.metadata.post({ dataSets: updatedDatasets }).getData();
-            console.info(`Dataset Update status : ${result.status}, stats: ${JSON.stringify(result.stats)} `);
+            console.debug(`Dataset Update status : ${result.status}, stats: ${JSON.stringify(result.stats)} `);
 
             /*Do the same with curl
             1. Get the first dataset with curl and save to a local file
