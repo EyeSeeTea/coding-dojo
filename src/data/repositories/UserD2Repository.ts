@@ -19,6 +19,7 @@ export class UserD2Repository implements UserRepository {
         return new User({
             id: d2User.id,
             name: d2User.displayName,
+            isDisabled: d2User.userCredentials.disabled,
             userGroups: d2User.userGroups,
             ...d2User.userCredentials,
         });
@@ -32,6 +33,7 @@ const userFields = {
     userCredentials: {
         username: true,
         userRoles: { id: true, name: true, authorities: true },
+        disabled: true,
     },
 } as const;
 

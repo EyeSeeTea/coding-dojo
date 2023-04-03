@@ -14,6 +14,7 @@ export function getTestUser(): User {
         username: "admin",
         userGroups: [],
         userRoles: [],
+        isDisabled: false,
     });
 }
 
