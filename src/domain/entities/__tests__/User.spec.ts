@@ -56,7 +56,7 @@ describe("User", () => {
 
         user.disable(new Date("2023-02-18T03:24:00"));
 
-        expect(user.getDisabledDaysCount()).toBeGreaterThanOrEqual(0);
+        expect(user.getDisabledDaysCount()).toBeLessThanOrEqual(0);
     });
 
     test("(admin) that is disabled should return disabled days as undefined", () => {
