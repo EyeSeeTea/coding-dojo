@@ -38,7 +38,10 @@ describe("User", () => {
 });
 
 function createAdminUser(): User {
-    const adminRoles = [{ id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL", "F_METADATA_IMPORT"] }];
+    const adminRoles = [
+        { id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL"] },
+        { id: "AciW92in2kk", name: "Metadata user", authorities: ["F_METADATA_IMPORT"] },
+    ];
     const adminGroups = [{ id: "wl5cDMuUhmF", name: "Administrators" }];
 
     return createUser(adminRoles, adminGroups);

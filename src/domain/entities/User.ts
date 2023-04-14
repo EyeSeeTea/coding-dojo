@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { NamedRef } from "./Ref";
 
 export interface UserData {
@@ -36,9 +37,9 @@ export class User {
     }
 
     isAdmin(): boolean {
-        const hasAuthorities = this.userRoles.some(
-            ({ authorities }) => authorities.includes("ALL") && authorities.includes("F_METADATA_IMPORT")
-        );
+        const authorities = this.userRoles.flatMap(userRole => userRole.authorities);
+        const requiredAuthorities = ["ALL", "F_METADATA_IMPORT"];
+        const hasAuthorities = _.difference(requiredAuthorities, authorities).length === 0;
         const isInAdminUserGroup = this.userGroups.some(({ name }) => name === "Administrators");
 
         return hasAuthorities && isInAdminUserGroup && !this.isDisabled;
