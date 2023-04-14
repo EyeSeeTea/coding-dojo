@@ -3,7 +3,7 @@ import { describe, expect, it } from "@jest/globals";
 import { NamedRef } from "../Ref";
 
 describe("User", () => {
-    it("should be admin if has a role with authority ALL", () => {
+    it("should be admin if has a role with authority ALL and F_METADATA_IMPORT and is in the Administrators user group", () => {
         const user = createAdminUser();
 
         expect(user.isAdmin()).toBe(true);
@@ -38,9 +38,10 @@ describe("User", () => {
 });
 
 function createAdminUser(): User {
-    const adminRoles = [{ id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL"] }];
+    const adminRoles = [{ id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL", "F_METADATA_IMPORT"] }];
+    const adminGroups = [{ id: "wl5cDMuUhmF", name: "Administrators" }];
 
-    return createUser(adminRoles, []);
+    return createUser(adminRoles, adminGroups);
 }
 
 function createNonAdminUser(): User {
