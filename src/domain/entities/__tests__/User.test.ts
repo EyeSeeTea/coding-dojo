@@ -84,7 +84,6 @@ describe("User", () => {
 
     // timestamp
     it("should be disabled and the timestamp be unaltered if user already disabled and not admin", () => {
-        jest.useFakeTimers().setSystemTime(new Date("2023-01-01"));
         nonAdminProps.disabled = true;
 
         const user = makeUser(nonAdminProps);
@@ -94,7 +93,7 @@ describe("User", () => {
     });
 
     it("that is disabled should have an accuarate timestamp", () => {
-        jest.useFakeTimers().setSystemTime(new Date("2023-03-29"));
+        jest.useFakeTimers().setSystemTime(getFakeDate(2, "-"));
         nonAdminProps.disabled = true;
 
         const user = makeUser(nonAdminProps);
@@ -104,7 +103,7 @@ describe("User", () => {
     });
 
     it("disabled timestamp should be older than present", () => {
-        jest.useFakeTimers().setSystemTime(new Date("2040-01-01"));
+        jest.useFakeTimers().setSystemTime(getFakeDate(2, "+"));
         nonAdminProps.disabled = true;
 
         const user = makeUser(nonAdminProps);
@@ -126,4 +125,13 @@ function makeUser(props: UserProps): User {
         userGroups: props.userGroups,
         disabled: props.disabled,
     });
+}
+
+function getFakeDate(nDays: number, op: "+" | "-") {
+    const date = new Date();
+    if (op === "+") {
+        return new Date(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate() + nDays}`);
+    } else {
+        return new Date(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate() - nDays}`);
+    }
 }
