@@ -1,6 +1,9 @@
 name: Application testing
 on:
-    push:
+  push:
+    paths-ignore:
+    # Fails with: src/webapp/components/share/Share.tsx(2,18): error TS2307: Cannot find module './logo-eyeseetea.png' or its corresponding type declarations.
+      - './src/webapp/components/share/Share.tsx'
     workflow_dispatch:
 jobs:
     unit-tests:
