@@ -15,7 +15,11 @@ type OUs = Maybe<{
 }>;
 
 function printOUs(orgs: OUs[]) {
-    orgs.forEach(org => console.debug(`[${org?.id}] ${org?.name} (${org?.code})`));
+    orgs.forEach(org =>
+        console.debug(
+            `[${org?.id.toLocaleUpperCase()}] ${org?.name.toLocaleUpperCase()} (${org?.code.toLocaleUpperCase()})`
+        )
+    );
 }
 
 function main() {
@@ -42,7 +46,7 @@ function main() {
                     },
                 })
                 .getData()
-                .then(data => data.objects.map(i => i));
+                .then(data => data.objects);
 
             printOUs(orgs);
         },
