@@ -1,17 +1,26 @@
-import { User, UserRole } from "../User";
+import { User, UserGroup, UserRole } from "../User";
 import { describe, expect, it } from "@jest/globals";
-import { NamedRef } from "../Ref";
 
 describe("User", () => {
     it("should be admin if has a role with authority ALL and F_METADATA_IMPORT and is in the Administrators user group", () => {
         const user = createAdminUser();
 
-        expect(user.isAdmin()).toBe(true);
+        const requiredAuthorities = ["ALL", "F_METADATA_IMPORT"];
+        const adminGroup = "Administrators";
+
+        const isActive = user.isActive();
+        const hasAuthorities = user.hasRequiredAuthorities(requiredAuthorities);
+        const belongToAdminUserGroup = user.belongToAdminUserGroup(adminGroup);
+
+        expect(isActive && hasAuthorities && belongToAdminUserGroup).toBe(true);
     });
     it("should no be admin if hasn't a role with authority ALL", () => {
         const user = createNonAdminUser();
+        const requiredAuthorities = ["ALL", "F_METADATA_IMPORT"];
 
-        expect(user.isAdmin()).toBe(false);
+        const hasAuthorities = user.hasRequiredAuthorities(requiredAuthorities);
+
+        expect(hasAuthorities).toBe(false);
     });
     it("should return belong to user group equal to false when the id exist", () => {
         const userGroupId = "BwyMfDBLih9";
@@ -53,7 +62,7 @@ function createNonAdminUser(): User {
     return createUser(nonAdminRoles, []);
 }
 
-function createUserWithGroups(userGroups: NamedRef[] = []): User {
+function createUserWithGroups(userGroups: UserGroup[] = []): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
@@ -64,7 +73,7 @@ function createUserWithGroups(userGroups: NamedRef[] = []): User {
     });
 }
 
-function createUser(userRoles: UserRole[], userGroups: NamedRef[] = []): User {
+function createUser(userRoles: UserRole[], userGroups: UserGroup[] = []): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
