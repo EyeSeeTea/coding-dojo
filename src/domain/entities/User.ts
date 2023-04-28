@@ -1,16 +1,22 @@
+import _ from "lodash";
 import { NamedRef } from "./Ref";
 
 export interface UserData {
     id: string;
     name: string;
     username: string;
-    isDisabled: boolean;
     userRoles: UserRole[];
-    userGroups: NamedRef[];
+    userGroups: UserGroup[];
+    isDisabled: boolean;
 }
 
 export interface UserRole extends NamedRef {
     authorities: string[];
+}
+
+export interface UserGroup {
+    id: string;
+    name: string;
 }
 
 export class User {
@@ -18,9 +24,9 @@ export class User {
     public readonly name: string;
     public readonly username: string;
 
-    private readonly isDisabled: boolean;
-    private readonly userGroups: NamedRef[];
+    private readonly userGroups: UserGroup[];
     private readonly userRoles: UserRole[];
+    private readonly isDisabled: boolean;
 
     constructor(data: UserData) {
         this.id = data.id;
@@ -35,11 +41,16 @@ export class User {
         return this.userGroups.some(({ id }) => id === userGroupUid);
     }
 
-    isAdmin(): boolean {
-        const isInAdminGroup = this.userGroups.some(ug => ug.name === "Administrators");
-        const hasAuthorities = this.userRoles.some(
-            ({ authorities }) => authorities.includes("ALL") && authorities.includes("F_METADATA_IMPORT")
-        );
-        return hasAuthorities && isInAdminGroup && !this.isDisabled;
+    hasRequiredAuthorities(requiredAuthorities: string[]): boolean {
+        const authorities = this.userRoles.flatMap(userRole => userRole.authorities);
+        return _.difference(requiredAuthorities, authorities).length === 0;
+    }
+
+    belongToAdminUserGroup(userGroupName: string): boolean {
+        return this.userGroups.some(({ name }) => name === userGroupName);
+    }
+
+    isActive(): boolean {
+        return !this.isDisabled;
     }
 }

@@ -1,18 +1,27 @@
-import { User, UserRole } from "../User";
+import { User, UserGroup, UserRole } from "../User";
 import { describe, expect, it } from "@jest/globals";
-import { NamedRef } from "../Ref";
 
 describe("User", () => {
-    it("should be admin if has a role with authorities ALL and F_METADATA_IMPORT, belongs to group Administrator and is not disabled", () => {
+    it("should be admin if has a role with authority ALL and F_METADATA_IMPORT and is in the Administrators user group", () => {
         const user = createAdminUser();
 
-        expect(user.isAdmin()).toBe(true);
+        const requiredAuthorities = ["ALL", "F_METADATA_IMPORT"];
+        const adminGroup = "Administrators";
+
+        const isActive = user.isActive();
+        const hasAuthorities = user.hasRequiredAuthorities(requiredAuthorities);
+        const belongToAdminUserGroup = user.belongToAdminUserGroup(adminGroup);
+
+        expect(isActive && hasAuthorities && belongToAdminUserGroup).toBe(true);
     });
 
-    it("should no be admin if hasn't a role with authority ALL and F_METADATA_IMPORT, does not belong to administrators or is disabled", () => {
+    it("should no be admin if hasn't a role with authority ALL", () => {
         const user = createNonAdminUser();
+        const requiredAuthorities = ["ALL", "F_METADATA_IMPORT"];
 
-        expect(user.isAdmin()).toBe(false);
+        const hasAuthorities = user.hasRequiredAuthorities(requiredAuthorities);
+
+        expect(hasAuthorities).toBe(false);
     });
 
     it("should return belong to user group equal to false when the id exist", () => {
@@ -42,27 +51,22 @@ describe("User", () => {
 });
 
 function createAdminUser(): User {
-    const adminRoles = [{ id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL", "F_METADATA_IMPORT"] }];
+    const adminRoles = [
+        { id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL"] },
+        { id: "AciW92in2kk", name: "Metadata user", authorities: ["F_METADATA_IMPORT"] },
+    ];
+    const adminGroups = [{ id: "wl5cDMuUhmF", name: "Administrators" }];
 
-    return createUser(
-        adminRoles,
-        [
-            {
-                id: "wl5cDMuUhmF",
-                name: "Administrators",
-            },
-        ],
-        false
-    );
+    return createUser(adminRoles, adminGroups);
 }
 
 function createNonAdminUser(): User {
-    const nonAdminRoles = [{ id: "Hg7n0MwzUQn", name: "Malaria", authorities: ["ALL"] }];
+    const nonAdminRoles = [{ id: "Hg7n0MwzUQn", name: "Malaria", authorities: ["F_EXPORT_DATA"] }];
 
-    return createUser(nonAdminRoles, [], true);
+    return createUser(nonAdminRoles, []);
 }
 
-function createUserWithGroups(userGroups: NamedRef[] = []): User {
+function createUserWithGroups(userGroups: UserGroup[] = []): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
@@ -73,13 +77,13 @@ function createUserWithGroups(userGroups: NamedRef[] = []): User {
     });
 }
 
-function createUser(userRoles: UserRole[], userGroups: NamedRef[] = [], isDisabled = false): User {
+function createUser(userRoles: UserRole[], userGroups: UserGroup[] = []): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
         username: "example",
         userRoles,
         userGroups,
-        isDisabled,
+        isDisabled: false,
     });
 }
