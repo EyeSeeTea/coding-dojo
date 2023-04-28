@@ -1,5 +1,5 @@
-import _ from "lodash";
-import { NamedRef } from "./Ref";
+import { UserGroup } from "./UserGroup";
+import { UserRole } from "./UserRole";
 
 export interface UserData {
     id: string;
@@ -8,15 +8,6 @@ export interface UserData {
     userRoles: UserRole[];
     userGroups: UserGroup[];
     isDisabled: boolean;
-}
-
-export interface UserRole extends NamedRef {
-    authorities: string[];
-}
-
-export interface UserGroup {
-    id: string;
-    name: string;
 }
 
 export class User {
@@ -41,16 +32,7 @@ export class User {
         return this.userGroups.some(({ id }) => id === userGroupUid);
     }
 
-    hasRequiredAuthorities(requiredAuthorities: string[]): boolean {
-        const authorities = this.userRoles.flatMap(userRole => userRole.authorities);
-        return _.difference(requiredAuthorities, authorities).length === 0;
-    }
-
-    belongToAdminUserGroup(userGroupName: string): boolean {
-        return this.userGroups.some(({ name }) => name === userGroupName);
-    }
-
-    isActive(): boolean {
-        return !this.isDisabled;
+    isAdmin(): boolean {
+        return UserRole.haveAdminAuthorities(this.userRoles) && UserGroup.hasAdmin(this.userGroups) && !this.isDisabled;
     }
 }
