@@ -5,18 +5,13 @@ export interface UserData {
     id: string;
     name: string;
     username: string;
-    userRoles: UserRole[];
-    userGroups: UserGroup[];
     isDisabled: boolean;
+    userRoles: UserRole[];
+    userGroups: NamedRef[];
 }
 
 export interface UserRole extends NamedRef {
     authorities: string[];
-}
-
-export interface UserGroup {
-    id: string;
-    name: string;
 }
 
 export class User {
@@ -24,9 +19,9 @@ export class User {
     public readonly name: string;
     public readonly username: string;
 
-    private readonly userGroups: UserGroup[];
-    private readonly userRoles: UserRole[];
     private readonly isDisabled: boolean;
+    private readonly userGroups: NamedRef[];
+    private readonly userRoles: UserRole[];
 
     constructor(data: UserData) {
         this.id = data.id;
@@ -41,16 +36,11 @@ export class User {
         return this.userGroups.some(({ id }) => id === userGroupUid);
     }
 
-    hasRequiredAuthorities(requiredAuthorities: string[]): boolean {
-        const authorities = this.userRoles.flatMap(userRole => userRole.authorities);
-        return _.difference(requiredAuthorities, authorities).length === 0;
-    }
-
-    belongToAdminUserGroup(userGroupName: string): boolean {
-        return this.userGroups.some(({ name }) => name === userGroupName);
-    }
-
-    isActive(): boolean {
-        return !this.isDisabled;
+    isAdmin(): boolean {
+        const authorities = this.userRoles.flatMap(r => r.authorities);
+        const isInAdminGroup = this.userGroups.some(ug => ug.name === "Administrators");
+        const requiredAuthorities = ["ALL", "F_METADATA_IMPORT"];
+        const hasAuthorities = _.difference(requiredAuthorities, authorities).length === 0;
+        return hasAuthorities && isInAdminGroup && !this.isDisabled;
     }
 }
