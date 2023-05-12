@@ -1,6 +1,7 @@
-import { User, UserRole } from "../User";
+import { User } from "../User";
 import { describe, expect, it } from "@jest/globals";
-import { NamedRef } from "../Ref";
+import { UserGroup, UserGroupData } from "../UserGroup";
+import { UserRole, UserRoleData } from "../UserRole";
 
 describe("User", () => {
     it("should be admin if has a role with authority ALL+Import Metadata and belongs to Administrators group and is enabled", () => {
@@ -26,29 +27,6 @@ describe("User", () => {
 
         expect(user.isAdmin()).toBe(false);
     });
-
-    // it("should return belong to user group equal to false when the id exist", () => {
-    //     const userGroupId = "BwyMfDBLih9";
-
-    //     const user = createUserWithGroups([{ id: userGroupId, name: "Group 1" }]);
-
-    //     expect(user.belongToUserGroup(userGroupId)).toBe(true);
-    // });
-    // it("should return belong to user group equal to false when the id does not exist", () => {
-    //     const existedUserGroupId = "BwyMfDBLih9";
-    //     const nonExistedUserGroupId = "f31IM13BgwJ";
-
-    //     const user = createUserWithGroups([{ id: existedUserGroupId, name: "Group 1" }]);
-
-    //     expect(user.belongToUserGroup(nonExistedUserGroupId)).toBe(false);
-    // });
-    // it("should return belong to user group equal to false if user groups is empty", () => {
-    //     const nonExistedUserGroupId = "f31IM13BgwJ";
-
-    //     const user = createUserWithGroups();
-
-    //     expect(user.belongToUserGroup(nonExistedUserGroupId)).toBe(false);
-    // });
 });
 
 function createAdminUser(): User {
@@ -79,24 +57,13 @@ function createNonAdminGroupUser(): User {
     return createUser(adminRoles, nonAdminGroups, false);
 }
 
-function createUser(userRoles: UserRole[], userGroups: NamedRef[] = [], isDisabled: boolean): User {
+function createUser(userRolesAttr: UserRoleData[], userGroupsAttr: UserGroupData[], isDisabled: boolean): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
         username: "example",
-        userRoles,
-        userGroups,
+        userRoles: userRolesAttr.map(userRoleAttr => new UserRole(userRoleAttr)),
+        userGroups: userGroupsAttr.map(userGroupsAttr => new UserGroup(userGroupsAttr)),
         isDisabled: isDisabled,
     });
 }
-
-// function createUserWithGroups(userGroups: NamedRef[] = []): User {
-//     return new User({
-//         id: "YjJdEO6d38H",
-//         name: "Example test",
-//         username: "example",
-//         userRoles: [],
-//         userGroups,
-//         isDisabled: false,
-//     });
-// }

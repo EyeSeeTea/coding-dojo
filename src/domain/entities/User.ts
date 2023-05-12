@@ -1,4 +1,5 @@
-import { NamedRef } from "./Ref";
+import { UserGroup } from "./UserGroup";
+import { UserRole } from "./UserRole";
 
 export interface UserData {
     id: string;
@@ -6,23 +7,7 @@ export interface UserData {
     isDisabled: boolean;
     username: string;
     userRoles: UserRole[];
-    userGroups: NamedRef[];
-}
-
-export interface UserRole extends NamedRef {
-    authorities: string[];
-}
-
-export class UserRoles {
-    constructor(data: UserRole) {
-        this.authorities = data.authorities;
-    }
-
-    public readonly authorities: string[];
-    //For later exercises.
-    public hasAuthorityAllOrImportMetdata(): boolean {
-        return this.authorities.includes("ALL") || this.authorities.includes("F_METADATA_IMPORT");
-    }
+    userGroups: UserGroup[];
 }
 
 export class User {
@@ -31,7 +16,7 @@ export class User {
     public readonly username: string;
     public readonly isDisabled: boolean;
 
-    private readonly userGroups: NamedRef[];
+    private readonly userGroups: UserGroup[];
     private readonly userRoles: UserRole[];
 
     constructor(data: UserData) {
@@ -43,18 +28,7 @@ export class User {
         this.isDisabled = data.isDisabled;
     }
 
-    belongToUserGroup(userGroupUid: string): boolean {
-        return this.userGroups.some(({ id }) => id === userGroupUid);
-    }
-
-    belongToUserGroupByName(userGroupName: string): boolean {
-        return this.userGroups.some(({ name }) => name === userGroupName);
-    }
-
     isAdmin(): boolean {
-        const hasFullAuthority =
-            this.userRoles.some(({ authorities }) => authorities.includes("ALL")) &&
-            this.userRoles.some(({ authorities }) => authorities.includes("F_METADATA_IMPORT"));
-        return hasFullAuthority && this.belongToUserGroupByName("Administrators") && !this.isDisabled;
+        return UserRole.haveFullAuthority(this.userRoles) && UserGroup.hasAnyAdmin(this.userGroups) && !this.isDisabled;
     }
 }
