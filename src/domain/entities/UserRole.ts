@@ -1,11 +1,13 @@
 import { NamedRef } from "./Ref";
 
+export type Authority = "superadmin" | "import";
+
 export interface UserRoleData extends NamedRef {
-    authorities: string[];
+    authorities: Authority[];
 }
 
 export class UserRole {
-    private readonly authorities: string[];
+    private readonly authorities: Authority[];
 
     constructor(data: UserRoleData) {
         this.authorities = data.authorities;
@@ -13,8 +15,8 @@ export class UserRole {
 
     public hasFullAuthority(): boolean {
         return (
-            this.authorities.some(authority => authority.includes("ALL")) &&
-            this.authorities.some(authority => authority.includes("F_METADATA_IMPORT"))
+            this.authorities.some(authority => authority === "superadmin") &&
+            this.authorities.some(authority => authority === "import")
         );
     }
 
