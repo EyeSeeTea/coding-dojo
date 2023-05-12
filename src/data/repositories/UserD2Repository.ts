@@ -1,5 +1,6 @@
 import { FutureData } from "../../domain/entities/Future";
 import { User } from "../../domain/entities/User";
+import { UserGroup } from "../../domain/entities/UserGroup";
 import { UserRepository } from "../../domain/repositories/UserRepository";
 import { D2Api, MetadataPick } from "../../types/d2-api";
 import { apiToFuture } from "../../utils/futures";
@@ -19,7 +20,7 @@ export class UserD2Repository implements UserRepository {
         return new User({
             id: d2User.id,
             name: d2User.displayName,
-            userGroups: d2User.userGroups,
+            userGroups: d2User.userGroups.map(ug => new UserGroup(ug)),
             isDisabled: d2User.userCredentials.disabled,
             ...d2User.userCredentials,
         });

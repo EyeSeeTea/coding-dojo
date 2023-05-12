@@ -1,6 +1,7 @@
-import { User, UserRole } from "../User";
+import { User } from "../User";
 import { describe, expect, it } from "@jest/globals";
-import { NamedRef } from "../Ref";
+import { UserRole } from "../UserRole";
+import { UserGroup } from "../UserGroup";
 
 describe("User", () => {
     it("should be admin if has a role with authorities ALL and F_METADATA_IMPORT, belongs to group Administrator and is not disabled", () => {
@@ -18,7 +19,7 @@ describe("User", () => {
     it("should return belong to user group equal to false when the id exist", () => {
         const userGroupId = "BwyMfDBLih9";
 
-        const user = createUserWithGroups([{ id: userGroupId, name: "Group 1" }]);
+        const user = createUserWithGroups([createUserGroup(userGroupId, "Group 1")]);
 
         expect(user.belongToUserGroup(userGroupId)).toBe(true);
     });
@@ -27,7 +28,7 @@ describe("User", () => {
         const existedUserGroupId = "BwyMfDBLih9";
         const nonExistedUserGroupId = "f31IM13BgwJ";
 
-        const user = createUserWithGroups([{ id: existedUserGroupId, name: "Group 1" }]);
+        const user = createUserWithGroups([createUserGroup(existedUserGroupId, "Group 1")]);
 
         expect(user.belongToUserGroup(nonExistedUserGroupId)).toBe(false);
     });
@@ -42,18 +43,12 @@ describe("User", () => {
 });
 
 function createAdminUser(): User {
-    const adminRoles = [{ id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL", "F_METADATA_IMPORT"] }];
+    const adminRoles = [
+        { id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL"] },
+        { id: "AciW92in2kk", name: "Metadata user", authorities: ["F_METADATA_IMPORT"] },
+    ];
 
-    return createUser(
-        adminRoles,
-        [
-            {
-                id: "wl5cDMuUhmF",
-                name: "Administrators",
-            },
-        ],
-        false
-    );
+    return createUser(adminRoles, [createUserGroup("wl5cDMuUhmF", "Administrators")], false);
 }
 
 function createNonAdminUser(): User {
@@ -62,7 +57,7 @@ function createNonAdminUser(): User {
     return createUser(nonAdminRoles, [], true);
 }
 
-function createUserWithGroups(userGroups: NamedRef[] = []): User {
+function createUserWithGroups(userGroups: UserGroup[] = []): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
@@ -73,7 +68,7 @@ function createUserWithGroups(userGroups: NamedRef[] = []): User {
     });
 }
 
-function createUser(userRoles: UserRole[], userGroups: NamedRef[] = [], isDisabled = false): User {
+function createUser(userRoles: UserRole[], userGroups: UserGroup[] = [], isDisabled = false): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
@@ -82,4 +77,8 @@ function createUser(userRoles: UserRole[], userGroups: NamedRef[] = [], isDisabl
         userGroups,
         isDisabled,
     });
+}
+
+function createUserGroup(id: string, name: string) {
+    return new UserGroup({ id, name });
 }

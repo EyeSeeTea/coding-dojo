@@ -1,4 +1,6 @@
 import { NamedRef } from "./Ref";
+import { UserGroup } from "./UserGroup";
+import { UserRole } from "./UserRole";
 
 export interface UserData {
     id: string;
@@ -6,10 +8,10 @@ export interface UserData {
     username: string;
     isDisabled: boolean;
     userRoles: UserRole[];
-    userGroups: NamedRef[];
+    userGroups: UserGroup[];
 }
 
-export interface UserRole extends NamedRef {
+export interface UserRoleData extends NamedRef {
     authorities: string[];
 }
 
@@ -19,7 +21,7 @@ export class User {
     public readonly username: string;
 
     private readonly isDisabled: boolean;
-    private readonly userGroups: NamedRef[];
+    private readonly userGroups: UserGroup[];
     private readonly userRoles: UserRole[];
 
     constructor(data: UserData) {
@@ -36,10 +38,6 @@ export class User {
     }
 
     isAdmin(): boolean {
-        const isInAdminGroup = this.userGroups.some(ug => ug.name === "Administrators");
-        const hasAuthorities = this.userRoles.some(
-            ({ authorities }) => authorities.includes("ALL") && authorities.includes("F_METADATA_IMPORT")
-        );
-        return hasAuthorities && isInAdminGroup && !this.isDisabled;
+        return UserRole.haveAdminAuthorities(this.userRoles) && UserGroup.isAdmin(this.userGroups) && !this.isDisabled;
     }
 }
