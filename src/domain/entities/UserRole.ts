@@ -1,16 +1,18 @@
 import _ from "lodash";
 import { NamedRef } from "./Ref";
 
+export type Authority = "superadmin" | "import";
+
 export interface UserRoleData extends NamedRef {
-    authorities: string[];
+    authorities: Authority[];
 }
 
 export class UserRole {
     public readonly id: string;
     public readonly name: string;
-    public readonly authorities: string[];
+    public readonly authorities: Authority[];
 
-    static requiredAuthorities = ["ALL", "F_METADATA_IMPORT"];
+    static requiredAuthorities: Authority[] = ["superadmin", "import"];
 
     constructor(data: UserRoleData) {
         this.id = data.id;

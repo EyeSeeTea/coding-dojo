@@ -1,7 +1,7 @@
 import { User } from "../User";
 import { describe, expect, it } from "@jest/globals";
-import { UserGroup } from "../UserGroup";
-import { UserRole } from "../UserRole";
+import { UserGroup, UserGroupData } from "../UserGroup";
+import { Authority, UserRole, UserRoleData } from "../UserRole";
 
 describe("User", () => {
     it("should be admin if has a role with authority ALL and F_METADATA_IMPORT and is in the Administrators user group", () => {
@@ -42,8 +42,8 @@ describe("User", () => {
 
 function createAdminUser(): User {
     const adminRoles = [
-        { id: "Hg7n0MwzUQn", name: "Super user", authorities: ["ALL"] },
-        { id: "AciW92in2kk", name: "Metadata user", authorities: ["F_METADATA_IMPORT"] },
+        { id: "Hg7n0MwzUQn", name: "Super user", authorities: ["superadmin"] as Authority[] },
+        { id: "AciW92in2kk", name: "Metadata user", authorities: ["import"] as Authority[] },
     ];
     const adminGroups = new UserGroup({ id: "wl5cDMuUhmF", name: "Administrators" });
 
@@ -51,7 +51,7 @@ function createAdminUser(): User {
 }
 
 function createNonAdminUser(): User {
-    const nonAdminRoles = [{ id: "Hg7n0MwzUQn", name: "Malaria", authorities: ["F_EXPORT_DATA"] }];
+    const nonAdminRoles = [{ id: "Hg7n0MwzUQn", name: "Malaria", authorities: [] as Authority[] }];
 
     return createUser(nonAdminRoles, []);
 }
@@ -67,13 +67,13 @@ function createUserWithGroups(userGroups: UserGroup[] = []): User {
     });
 }
 
-function createUser(userRoles: UserRole[], userGroups: UserGroup[] = []): User {
+function createUser(userRoleAttrs: UserRoleData[], userGroupAttrs: UserGroupData[] = []): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "Example test",
         username: "example",
-        userRoles,
-        userGroups,
+        userRoles: userRoleAttrs.map(userRoleAttr => new UserRole(userRoleAttr)),
+        userGroups: userGroupAttrs.map(userGroupAttr => new UserGroup(userGroupAttr)),
         isDisabled: false,
     });
 }
