@@ -96,3 +96,15 @@ Check the example script, entry `"script-example"`in `package.json`->scripts and
   - An admin user can not be disabled
   - We should be able to know if a user is disabled and disabled days count
 Create unit tests for requirements
+
+
+### D2-Api
+#### S1 tasks
+##### Exercise 1: 
+- new script using api.models
+- get organisationUnits in the instance (fields: id, name, code)
+- print org units, format: "[ID] NAME (CODE)" 
+- One line per org unit. 
+##### Exercise 2: 
+- new script using api.models and api.metadata (bulk)
+- get all orgUnits for group "NGO", set the closedDate for today and post them.
