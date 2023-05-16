@@ -105,7 +105,8 @@
         "prepare": "husky install",
         "script-example": "npx ts-node src/scripts/example.ts",
         "script-getOUs": ". ./.env.local && npx ts-node src/scripts/getOUIdNameCode.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL",
-        "script-closeNgoOUs": ". ./.env.local && npx ts-node src/scripts/closeNgoOUs.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL"
+        "script-closeNgoOUs": ". ./.env.local && npx ts-node src/scripts/closeNgoOUs.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL",
+        "script-addLegendToNumberDEs": ". ./.env.local && npx ts-node src/scripts/addLegendToNumberDEs.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL"
     },
     "manifest.webapp": {
         "name": "DHIS2 Skeleton App",

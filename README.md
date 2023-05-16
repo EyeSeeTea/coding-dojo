@@ -108,3 +108,9 @@ Create unit tests for requirements
 ##### Exercise 2: 
 - new script using api.models and api.metadata (bulk)
 - get all orgUnits for group "NGO", set the closedDate for today and post them.
+##### Exercise 3: 
+- Retrieve all data elements from type number in pages of 100 elements
+- Add it the legend ANC Coverage
+- Post the data elements using async parameter equal to true 
+- Wait to the result and print a summary of the task summaries
+- Practice debug mode and using chrome dev tools
