@@ -38,7 +38,7 @@ async function getPagedNumberDEs(api: D2Api, page: number, legendID: string): Pr
 function main() {
     const cmd = command({
         name: path.basename(__filename),
-        description: "Show DHIS2 instance info",
+        description: "Add the legend 'ANC Coverage' to all dataElements with type number.",
         args: {
             url: option({
                 type: string,

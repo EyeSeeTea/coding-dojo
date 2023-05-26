@@ -17,7 +17,7 @@ function printOUs(orgs: OUs[]) {
 function main() {
     const cmd = command({
         name: path.basename(__filename),
-        description: "Show DHIS2 instance info",
+        description: "Get all organisationUnits from 'NGO' group and set theirs closedDate for today.",
         args: {
             url: option({
                 type: string,

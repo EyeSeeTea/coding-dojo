@@ -25,7 +25,7 @@ function printOUs(orgs: OUs[]) {
 function main() {
     const cmd = command({
         name: path.basename(__filename),
-        description: "Show DHIS2 instance info",
+        description: "Get organisationUnits and prints the id, name and code.",
         args: {
             url: option({
                 type: string,
