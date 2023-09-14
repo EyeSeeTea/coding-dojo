@@ -1,9 +1,13 @@
 import { command, run, string, option } from "cmd-ts";
 import path from "path";
-import { D2Api, D2DataElement, Ref } from "../types/d2-api";
+import { D2Api, MetadataPick, Ref } from "../types/d2-api";
 
-async function getPagedNumberDEs(api: D2Api, page: number, legendID: string): Promise<D2DataElement[]> {
-    let data: D2DataElement[] = [];
+type deMetadata = MetadataPick<{
+    dataElements: { fields: { $owner: true } };
+}>;
+
+async function getPagedNumberDEs(api: D2Api, page: number, legendID: string): Promise<deMetadata> {
+    const aggregateData: deMetadata = { dataElements: [] };
     const { pager, objects } = await api.models.dataElements
         .get({
             fields: { $owner: true },
@@ -21,7 +25,7 @@ async function getPagedNumberDEs(api: D2Api, page: number, legendID: string): Pr
                     de.legendSets.push(legendSet);
                 }
 
-                return de as D2DataElement;
+                return de;
             });
 
             return { pager: data.pager, objects: objects };
@@ -29,10 +33,12 @@ async function getPagedNumberDEs(api: D2Api, page: number, legendID: string): Pr
 
     if (pager.pageCount > 1 && pager.page !== pager.pageCount) {
         const result = await getPagedNumberDEs(api, page + 1, legendID);
-        data = objects.concat(result);
+        aggregateData.dataElements = objects.concat(result.dataElements);
+    } else {
+        aggregateData.dataElements = objects;
     }
 
-    return data.length !== 0 ? data : objects;
+    return aggregateData;
 }
 
 function main() {
@@ -60,11 +66,11 @@ function main() {
 
             const numberDataElements = await getPagedNumberDEs(api, 1, legendID);
 
-            console.debug(numberDataElements.length);
-            console.debug(JSON.stringify(numberDataElements));
+            console.debug("numberDataElements len:\n", numberDataElements.dataElements.length);
+            // console.debug("numberDataElements:\n", JSON.stringify(numberDataElements));
 
-            const resultAsync = await api.metadata.postAsync({ dataElements: numberDataElements }).getData();
-            console.debug(JSON.stringify(resultAsync));
+            const resultAsync = await api.metadata.postAsync(numberDataElements).getData();
+            // console.debug("resultAsync:\n", JSON.stringify(resultAsync));
 
             const summary = await api.system.waitFor(resultAsync.response.jobType, resultAsync.response.id).getData();
             console.debug(`Async Post Status: ${summary?.status}`);

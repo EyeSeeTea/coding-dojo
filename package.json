@@ -106,7 +106,8 @@
         "script-example": "npx ts-node src/scripts/example.ts",
         "script-getOUs": ". ./.env.local && npx ts-node src/scripts/getOUIdNameCode.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL",
         "script-closeNgoOUs": ". ./.env.local && npx ts-node src/scripts/closeNgoOUs.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL",
-        "script-addLegendToNumberDEs": ". ./.env.local && npx ts-node src/scripts/addLegendToNumberDEs.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL"
+        "script-addLegendToNumberDEs": ". ./.env.local && npx ts-node src/scripts/addLegendToNumberDEs.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL",
+        "script-debug-addLegendToNumberDEs": ". ./.env.local && TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' node --inspect-brk -r ts-node/register src/scripts/addLegendToNumberDEs.ts --dhis2-url=https://$REACT_APP_DHIS2_AUTH@$REACT_APP_DHIS2_BASE_URL"
     },
     "manifest.webapp": {
         "name": "DHIS2 Skeleton App",
