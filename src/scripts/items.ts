@@ -147,7 +147,7 @@ export class GildedRose {
                     break;
                 }
 
-                case "Conjured Items": {
+                case "Conjured Mana Cake": {
                     const i = new ConjuredItem(item.name, item.sellIn, item.quality);
                     i.handleUpdate();
                     updatedItems.push(i);

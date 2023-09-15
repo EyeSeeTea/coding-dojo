@@ -124,7 +124,7 @@ describe("GildedRose Suite", () => {
     });
 
     it("Conjured quality value should be decreased by double", () => {
-        const itemProvider = new ItemInMemoryProvider([new Item("Conjured Items", 6, 10)]);
+        const itemProvider = new ItemInMemoryProvider([new Item("Conjured Mana Cake", 6, 10)]);
 
         const gildedRose = new GildedRose(itemProvider);
 
