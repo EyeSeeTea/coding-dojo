@@ -1,4 +1,4 @@
-import { ItemInMemoryProvider, Item, GildedRose } from "../../../scripts/items";
+import { GildedRose, Item, ItemInMemoryProvider } from "../Items";
 
 describe("GildedRose Suite", () => {
     it("Sell in value should be decreased", () => {

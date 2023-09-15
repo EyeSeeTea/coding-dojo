@@ -1,4 +1,4 @@
-import { GildedRose, Item, ItemInMemoryProvider } from "./items";
+import { GildedRose, Item, ItemInMemoryProvider } from "../domain/entities/Items";
 
 function main() {
     const itemProvider = new ItemInMemoryProvider([
