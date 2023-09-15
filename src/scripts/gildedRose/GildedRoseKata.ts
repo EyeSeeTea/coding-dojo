@@ -83,6 +83,8 @@ export class BasicItem extends Item {
         this.refreshQualityUpadateValue();
         this.updateSellIn();
         this.updateQuality();
+
+        return this;
     }
 }
 
@@ -91,8 +93,8 @@ export class BrieItem extends BasicItem {
 }
 
 export class LegendaryItem extends Item {
-    constructor(name: string, sellIn: number) {
-        super(name, sellIn, 80);
+    update() {
+        return this;
     }
 }
 
@@ -144,7 +146,7 @@ export class ItemInMemoryProvider {
                 case "cheese":
                     return new BrieItem(item.name, item.sellIn, item.quality);
                 case "legendary":
-                    return new LegendaryItem(item.name, item.sellIn);
+                    return new LegendaryItem(item.name, item.sellIn, item.quality);
                 case "backstagePasses":
                     return new BackstagePassesItem(item.name, item.sellIn, item.quality);
                 case "conjured":
@@ -171,13 +173,9 @@ export class GildedRose {
     updateQuality(): GildedRoseItem[] {
         const items = this.itemProvider.get();
 
-        items.forEach(item => {
-            if (!(item instanceof LegendaryItem)) {
-                item.update();
-            }
+        return items.map(item => {
+            return item.update();
         });
-
-        return items;
     }
 }
 

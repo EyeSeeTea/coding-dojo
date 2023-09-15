@@ -34,5 +34,7 @@ export class BasicItem extends Item {
         this.refreshQualityUpadateValue();
         this.updateSellIn();
         this.updateQuality();
+
+        return this;
     }
 }
