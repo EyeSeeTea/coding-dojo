@@ -17,42 +17,33 @@ function main() {
         },
         handler: async args => {
             const api = new D2Api({ baseUrl: args.url });
-            const orgUnitGroups = await api.models.organisationUnitGroups
-                .get({
-                    fields: {
-                        id: true,
-                    },
-                    filter: {
-                        code: { eq: "NGO" },
-                    },
-                })
-                .getData();
 
             const orgUnits = await api.models.organisationUnits
                 .get({
                     fields: {
                         $all: true,
                     },
+                    filter: {
+                        "organisationUnitGroups.name": { eq: "NGO" },
+                    },
+                    paging: false,
                 })
-                .getData();
+                .getData()
+                .then(res => res.objects);
 
-            //hardcoded random orgUnitGroup id because the one for NGO didn't exist
-            const filteredOrgUnits = orgUnits.objects.filter(({ organisationUnitGroups }) =>
-                organisationUnitGroups.map(el => el.id).includes("f25dqv3Y7Z0")
-            );
-
-            filteredOrgUnits.forEach(orgUnit => {
+            orgUnits.forEach(orgUnit => {
                 orgUnit.closedDate = new Date().toISOString();
             });
 
             const metadata = await api.metadata
                 .post({
                     organisationUnits: {
-                        ...filteredOrgUnits,
+                        ...orgUnits,
                     },
                 })
                 .getData();
 
+            console.debug(orgUnits.map(el => el.organisationUnitGroups));
             console.debug(metadata);
         },
     });

@@ -106,7 +106,9 @@
         "prepare": "husky install",
         "script-example": "npx ts-node src/scripts/example.ts",
         "script-exercise1": "npx ts-node src/scripts/exercise1.ts",
-        "script-exercise2": "npx ts-node src/scripts/exercise2.ts"
+        "script-exercise2": "npx ts-node src/scripts/exercise2.ts",
+        "script-exercise3": "npx ts-node src/scripts/exercise3.ts",
+        "script-solid": "npx ts-node src/scripts/solid.ts"
     },
     "manifest.webapp": {
         "name": "DHIS2 Skeleton App",
