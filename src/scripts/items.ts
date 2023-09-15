@@ -14,71 +14,67 @@ export class Item {
     }
 }
 
-abstract class ItemCategory {
-    constructor(protected item: Item) {}
-
-    abstract updateQuality(): void;
+interface ItemCategory {
+    updateQuality(item: Item): void;
 }
 
-class DefaultItemCategory extends ItemCategory {
-    updateQuality(): void {
-        this.item.sellIn--;
-        let qualityChange = 1;
-
-        if (this.item.sellIn < 0) {
-            qualityChange *= 2;
+class DefaultItemCategory implements ItemCategory {
+    updateQuality(item: Item): void {
+        if (item.quality > 0) {
+            item.quality -= 1;
         }
-
-        this.item.quality = Math.max(0, Math.min(50, this.item.quality - qualityChange));
+        item.sellIn -= 1;
+        if (item.sellIn < 0 && item.quality > 0) {
+            item.quality -= 1;
+        }
     }
 }
 
-class AgedBrieItemCategory extends ItemCategory {
-    updateQuality(): void {
-        this.item.sellIn--;
-        let qualityChange = 1;
-
-        if (this.item.sellIn < 0) {
-            qualityChange *= 2;
+class AgedBrieItemCategory implements ItemCategory {
+    updateQuality(item: Item): void {
+        if (item.quality < 50) {
+            item.quality += 1;
         }
-
-        this.item.quality = Math.min(50, this.item.quality + qualityChange);
+        item.sellIn -= 1;
+        if (item.sellIn < 0) {
+            item.quality *= 2;
+        }
     }
 }
 
-class SulfurasItemCategory extends ItemCategory {
+class SulfurasItemCategory implements ItemCategory {
     updateQuality(): void {
         // Legendary items have fixed values
     }
 }
 
-class BackstagePassesItemCategory extends ItemCategory {
-    updateQuality(): void {
-        this.item.sellIn--;
-        let qualityChange = 1;
-
-        if (this.item.sellIn < 0) {
-            qualityChange = -this.item.quality;
-        } else if (this.item.sellIn < 5) {
-            qualityChange = 3;
-        } else if (this.item.sellIn >= 5 && this.item.sellIn < 10) {
-            qualityChange = 2;
+class BackstagePassesItemCategory implements ItemCategory {
+    updateQuality(item: Item): void {
+        if (item.quality < 50) {
+            item.quality += 1;
+            if (item.sellIn < 11 && item.quality < 50) {
+                item.quality += 1;
+            }
+            if (item.sellIn < 6 && item.quality < 50) {
+                item.quality += 1;
+            }
         }
-
-        this.item.quality = Math.min(50, this.item.quality + qualityChange);
+        item.sellIn -= 1;
+        if (item.sellIn < 0) {
+            item.quality = 0;
+        }
     }
 }
 
-class ConjuredItemCategory extends ItemCategory {
-    updateQuality(): void {
-        this.item.sellIn--;
-        let qualityChange = 2;
-
-        if (this.item.sellIn < 0) {
-            qualityChange *= 2;
+class ConjuredItemCategory implements ItemCategory {
+    updateQuality(item: Item): void {
+        if (item.quality > 0) {
+            item.quality -= 2;
         }
-
-        this.item.quality = Math.max(0, this.item.quality - qualityChange);
+        item.sellIn -= 1;
+        if (item.sellIn < 0 && item.quality > 0) {
+            item.quality -= 2;
+        }
     }
 }
 
@@ -97,24 +93,24 @@ export class GildedRose {
 
         items.forEach(item => {
             const itemCategory = this.getItemCategory(item);
-            itemCategory.updateQuality();
+            itemCategory.updateQuality(item);
         });
 
         return items;
     }
 
-    private getItemCategory(item: Item): ItemCategory {
+    private getItemCategory(item: Item) {
         switch (item.name) {
             case "Aged Brie":
-                return new AgedBrieItemCategory(item);
+                return new AgedBrieItemCategory();
             case "Sulfuras, Hand of Ragnaros":
-                return new SulfurasItemCategory(item);
+                return new SulfurasItemCategory();
             case "Backstage passes to a TAFKAL80ETC concert":
-                return new BackstagePassesItemCategory(item);
+                return new BackstagePassesItemCategory();
             case "Conjured Mana Cake":
-                return new ConjuredItemCategory(item);
+                return new ConjuredItemCategory();
             default:
-                return new DefaultItemCategory(item);
+                return new DefaultItemCategory();
         }
     }
 }
