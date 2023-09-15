@@ -24,16 +24,30 @@ However, do not alter the Item class or Items property as those belong to the go
 Just for clarification, an item can never have its Quality increase above 50, however "Sulfuras" is a legendary item and as such its Quality is 80 and it never alters.
 */
 
+type ItemVariation = BackStagePasseseItem | NormalItem | ConjuredItem | AgedBrieItem | SulfarasItem;
+type ItemName =
+    | "Aged Brie"
+    | "Sulfuras, Hand of Ragnaros"
+    | "Backstage passes to a TAFKAL80ETC concert"
+    | "Conjured Mana Cake"
+    | "whatever"
+    | string;
+
+type NumberOfDays = number;
+type Quality = number;
+
 interface ItemUpdater {
     handleUpdate(item: Item): void;
 }
 
 export class Item {
-    name: string;
-    sellIn: number;
-    quality: number;
+    static readonly MAX_QUALITY = 50;
+    static readonly MIN_QUALITY = 0;
+    name: ItemName;
+    sellIn: NumberOfDays;
+    quality: Quality;
 
-    constructor(name: string, sellIn: number, quality: number) {
+    constructor(name: ItemName, sellIn: NumberOfDays, quality: Quality) {
         this.name = name;
         this.sellIn = sellIn;
         this.quality = quality;
@@ -51,116 +65,114 @@ export class ItemInMemoryProvider {
 }
 
 export class AgedBrieItem extends Item implements ItemUpdater {
-    handleUpdate = () => {
-        if (this.quality < 50) {
-            this.quality = this.quality + 1;
+    handleUpdate = (): AgedBrieItem => {
+        let updatedQuality = this.quality;
+
+        if (updatedQuality < Item.MAX_QUALITY) {
+            updatedQuality = updatedQuality + 1;
         }
 
-        this.sellIn = this.sellIn - 1;
+        const updatedSellin = this.sellIn - 1;
 
-        if (this.sellIn < 0) {
-            if (this.quality < 50) {
-                this.quality = this.quality + 1;
-            }
+        if (updatedSellin < 0 && updatedQuality < Item.MAX_QUALITY) {
+            updatedQuality = updatedQuality + 1;
         }
+
+        return new AgedBrieItem(this.name, updatedSellin, updatedQuality);
     };
 }
 
-export class SulfarasItem extends Item {
-    handleUpdate() {
-        this.quality = 80;
+export class SulfarasItem extends Item implements ItemUpdater {
+    handleUpdate(): SulfarasItem {
+        return new SulfarasItem(this.name, this.sellIn, 80);
     }
 }
 
 export class BackStagePasseseItem extends Item implements ItemUpdater {
-    handleUpdate() {
-        if (this.quality < 50) {
-            this.quality = this.quality + 1;
-            if (this.sellIn < 11) {
-                if (this.quality < 50) {
-                    this.quality = this.quality + 1;
-                }
+    handleUpdate(): BackStagePasseseItem {
+        let updatedQuality = this.quality;
+
+        if (updatedQuality < Item.MAX_QUALITY) {
+            updatedQuality = updatedQuality + 1;
+            if (this.sellIn <= 10) {
+                updatedQuality = updatedQuality + 1;
             }
-            if (this.sellIn < 6) {
-                if (this.quality < 50) {
-                    this.quality = this.quality + 1;
-                }
+            if (this.sellIn <= 5) {
+                updatedQuality = updatedQuality + 1;
             }
         }
 
-        this.sellIn = this.sellIn - 1;
+        const updatedSellin = this.sellIn - 1;
 
-        if (this.sellIn < 0) {
-            this.quality = this.quality - this.quality;
+        if (updatedSellin < 0) {
+            updatedQuality = updatedQuality - updatedQuality;
         }
+
+        return new BackStagePasseseItem(this.name, updatedSellin, updatedQuality);
     }
 }
 
 export class NormalItem extends Item implements ItemUpdater {
-    handleUpdate() {
-        if (this.quality > 0) this.quality = this.quality - 1;
-        this.sellIn = this.sellIn - 1;
+    handleUpdate(): NormalItem {
+        let updatedQuality = this.quality;
+        if (updatedQuality > Item.MIN_QUALITY) updatedQuality = updatedQuality - 1;
+        const updatedSellin = this.sellIn - 1;
 
-        if (this.sellIn < 0 && this.quality > 0) {
-            this.quality = this.quality - 1;
+        if (updatedSellin < 0 && updatedQuality > 0) {
+            updatedQuality = updatedQuality - 1;
         }
+        return new NormalItem(this.name, updatedSellin, updatedQuality);
     }
 }
 export class ConjuredItem extends Item implements ItemUpdater {
-    handleUpdate() {
-        if (this.quality > 1) this.quality = this.quality - 2;
-        this.sellIn = this.sellIn - 1;
+    handleUpdate(): ConjuredItem {
+        let updatedQuality = this.quality;
+        if (updatedQuality > 1) updatedQuality = updatedQuality - 2;
+        const updatedSellin = this.sellIn - 1;
 
-        if (this.sellIn < 0 && this.quality > 1) {
-            this.quality = this.quality - 2;
+        if (updatedSellin < 0 && updatedQuality > 1) {
+            updatedQuality = updatedQuality - 2;
         }
+
+        return new ConjuredItem(this.name, updatedSellin, updatedQuality);
     }
 }
+
+const itemFactory = (item: Item): ItemVariation => {
+    const args = [item.name, item.sellIn, item.quality] as const;
+
+    switch (item.name) {
+        case "Aged Brie": {
+            return new AgedBrieItem(...args);
+        }
+
+        case "Sulfuras, Hand of Ragnaros": {
+            return new SulfarasItem(...args);
+        }
+
+        case "Backstage passes to a TAFKAL80ETC concert": {
+            return new BackStagePasseseItem(...args);
+        }
+
+        case "Conjured Mana Cake": {
+            return new ConjuredItem(...args);
+        }
+
+        default: {
+            return new NormalItem(...args);
+        }
+    }
+};
 
 export class GildedRose {
     constructor(private itemProvider: ItemInMemoryProvider) {}
 
     updateQuality(): Item[] {
         const items = this.itemProvider.get();
-        const updatedItems: Item[] = [];
 
-        items.forEach(item => {
-            switch (item.name) {
-                case "Aged Brie": {
-                    const i = new AgedBrieItem(item.name, item.sellIn, item.quality);
-                    i.handleUpdate();
-                    updatedItems.push(i);
-                    break;
-                }
-
-                case "Sulfuras, Hand of Ragnaros": {
-                    const i = new SulfarasItem(item.name, item.sellIn, item.quality);
-                    i.handleUpdate();
-                    updatedItems.push(i);
-                    break;
-                }
-
-                case "Backstage passes to a TAFKAL80ETC concert": {
-                    const i = new BackStagePasseseItem(item.name, item.sellIn, item.quality);
-                    i.handleUpdate();
-                    updatedItems.push(i);
-                    break;
-                }
-
-                case "Conjured Mana Cake": {
-                    const i = new ConjuredItem(item.name, item.sellIn, item.quality);
-                    i.handleUpdate();
-                    updatedItems.push(i);
-                    break;
-                }
-
-                default: {
-                    const i = new NormalItem(item.name, item.sellIn, item.quality);
-                    i.handleUpdate();
-                    updatedItems.push(i);
-                    break;
-                }
-            }
+        const updatedItems = items.map(item => {
+            const childItem = itemFactory(item);
+            return childItem.handleUpdate();
         });
 
         return updatedItems;
