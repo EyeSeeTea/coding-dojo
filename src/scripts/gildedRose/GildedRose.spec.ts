@@ -1,8 +1,6 @@
-import { Item } from "../Item";
-import { GildedRose } from "../GildedRose";
-import { ItemInMemoryProvider } from "../../usecases/ItemInMemoryProvider";
+import { GildedRose, Item, ItemInMemoryProvider } from "./GildedRoseKata";
 
-describe("GildedRose Suite", () => {
+describe("GildedRose Suite Script", () => {
     it("Sell in value should be decreased", () => {
         const itemProvider = new ItemInMemoryProvider([new Item("whatever", 10, 0)]);
 

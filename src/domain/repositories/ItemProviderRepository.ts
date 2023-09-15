@@ -1,6 +1,5 @@
-import { UpdatableItem } from "./UpdatableItem";
-import { SulfurasItem } from "../entities/SulfurasItem";
+import { GildedRoseItem } from "../entities/GildedRose";
 
 export interface ItemProviderRepository {
-    get(): (UpdatableItem | SulfurasItem)[];
+    get(): GildedRoseItem[];
 }

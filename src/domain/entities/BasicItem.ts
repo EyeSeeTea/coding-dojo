@@ -1,26 +1,38 @@
 import { Item } from "./Item";
-import { Updatable } from "../repositories/UpdatableItem";
 
-export class BasicItem extends Item implements Updatable {
-    constructor(name: string, sellIn: number, quality: number) {
-        super(name, sellIn, quality);
-    }
+export class BasicItem extends Item {
+    protected qualityCap = { min: 0, max: 50 };
+    protected sellInUpdateValue = -1;
+    protected qualityUpdateValue = -1;
 
-    updateQuality(): void {
-        // Quality never negative
-        if (this.quality > 0) {
-            this.quality = this.quality - 1;
+    protected refreshQualityUpadateValue() {
+        if (this.sellIn <= 0) {
+            this.qualityUpdateValue += this.qualityUpdateValue;
         }
     }
 
-    updateSellIn(): void {
-        this.sellIn = this.sellIn - 1;
+    protected updateSellIn() {
+        this.sellIn += this.sellInUpdateValue;
     }
 
-    updateQualityWhenPassedSellIn(): void {
-        // Quality never negative
-        if (this.quality > 0) {
-            this.quality = this.quality - 1;
+    protected checkQualityCap() {
+        if (this.quality > this.qualityCap.max) {
+            this.quality = this.qualityCap.max;
         }
+
+        if (this.quality < this.qualityCap.min) {
+            this.quality = this.qualityCap.min;
+        }
+    }
+
+    protected updateQuality() {
+        this.quality += this.qualityUpdateValue;
+        this.checkQualityCap();
+    }
+
+    update() {
+        this.refreshQualityUpadateValue();
+        this.updateSellIn();
+        this.updateQuality();
     }
 }
