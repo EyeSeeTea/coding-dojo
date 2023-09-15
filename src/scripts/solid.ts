@@ -89,7 +89,7 @@ class BackstagePassItem implements ItemQuality {
         }
         item.sellIn = item.sellIn - 1;
         if (item.sellIn < 0) {
-            item.quality = 0;
+            item.quality = item.quality - item.quality;
         }
     }
 }
@@ -97,7 +97,7 @@ class BackstagePassItem implements ItemQuality {
 class SulfarasItem implements ItemQuality {
     readonly key: string = "sulfuras";
     save(item: Item) {
-        item.quality = item.quality;
+        item.quality = 80;
     }
 }
 
