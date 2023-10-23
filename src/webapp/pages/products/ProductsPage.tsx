@@ -1,37 +1,26 @@
+import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
 import {
     ConfirmationDialog,
     ObjectsList,
+    ReferenceObject,
     TableConfig,
     TablePagination,
     TableSorting,
     useObjectsTable,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
-
-import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
+import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
+import { TextField, Typography } from "@material-ui/core";
 import { useAppContext } from "../../contexts/app-context";
 import { useReload } from "../../hooks/use-reload";
 import i18n from "../../../utils/i18n";
-import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
-import { TextField, Typography } from "@material-ui/core";
 import styled from "styled-components";
-
-const dataElements = {
-    title: "qkvNoqnBdPk",
-    image: "m1yv8j2av5I",
-    quantity: "PZ7qxiDlYZ8",
-    status: "AUsNzRGzRuC",
-};
-
-interface ProgramEvent {
-    id: string;
-    title: string;
-    image: string;
-    quantity: number;
-    status: number;
-}
+import { Product } from "../../../domain/entities/Product";
+import { ProductView } from "../../../domain/repositories/ProductRepository";
 
 type ProductStatus = "active" | "inactive";
+
+function useProducts() {}
 
 export const ProductsPage: React.FC = React.memo(() => {
     const { compositionRoot, currentUser } = useAppContext();
@@ -39,7 +28,7 @@ export const ProductsPage: React.FC = React.memo(() => {
     const snackbar = useSnackbar();
 
     const [showEditQuantityDialog, setShowEditQuantityDialog] = useState(false);
-    const [editingProgramEvent, setEditingProgramEvent] = useState<ProgramEvent | undefined>(
+    const [editingProgramEvent, setEditingProgramEvent] = useState<ProductView | undefined>(
         undefined
     );
     const [editingEventId, setEditingEventId] = useState<string | undefined>(undefined);
@@ -50,13 +39,13 @@ export const ProductsPage: React.FC = React.memo(() => {
         async (id: string) => {
             if (id) {
                 if (!currentUser.isAdmin()) {
-                    snackbar.error(i18n.t("Only admin users can edit quantity od a product"));
+                    snackbar.error(i18n.t("Only admin users can edit quantity od a product")); //Render logic
                     return;
                 }
 
                 const api = compositionRoot.api.get;
 
-                const data = await api?.events
+                const data = await api?.events //Application
                     .getAll({
                         fields: eventsFields,
                         program: "x7s8Yurmj7Q",
@@ -67,6 +56,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                 const event = data?.events[0];
 
                 if (event) {
+                    //Application (updateQuantity)
                     const events = data?.events.map(buildProgramEvent);
                     const event = events[0];
 
@@ -82,7 +72,7 @@ export const ProductsPage: React.FC = React.memo(() => {
         [compositionRoot.api.get, currentUser, snackbar]
     );
 
-    const baseConfig: TableConfig<ProgramEvent> = useMemo(
+    const baseConfig: TableConfig<ProductView> = useMemo(
         () => ({
             columns: [
                 {
@@ -95,6 +85,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                     text: i18n.t("Image"),
                     sortable: false,
                     getValue: event => {
+                        //application
                         const url = `${compositionRoot.api.get?.baseUrl}/api/events/files?dataElementUid=${dataElements.image}&eventUid=${event.id}`;
                         return <img src={url} alt={event.title} width={100} />;
                     },
@@ -110,7 +101,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                     text: i18n.t("Status"),
                     sortable: false,
                     getValue: event => {
-                        const status = event.status === 0 ? "inactive" : "active";
+                        const status = !event.isActive ? "inactive" : "active";
 
                         return (
                             <StatusContainer status={status}>
@@ -147,11 +138,11 @@ export const ProductsPage: React.FC = React.memo(() => {
             async (
                 _search: string,
                 paging: TablePagination,
-                sorting: TableSorting<ProgramEvent>
+                sorting: TableSorting<ProductView>
             ) => {
-                const api = compositionRoot.api.get;
+                return compositionRoot.products.getAll.execute();
 
-                const data = await api?.events
+                const data = await api?.events //Application
                     .get({
                         fields: eventsFields,
                         program: "x7s8Yurmj7Q",
@@ -183,6 +174,7 @@ export const ProductsPage: React.FC = React.memo(() => {
     const tableProps = useObjectsTable(baseConfig, getRows);
 
     function cancelEditQuantity(): void {
+        //Render logic
         setShowEditQuantityDialog(false);
         setEditingEventId(undefined);
         setEditedQuantity(undefined);
@@ -202,7 +194,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                 status: quantity === 0 ? 0 : 1,
             };
 
-            const data = await api?.events
+            const data = await api?.events //Application
                 .getAll({
                     fields: { $all: true },
                     program: "x7s8Yurmj7Q",
@@ -230,6 +222,7 @@ export const ProductsPage: React.FC = React.memo(() => {
             const response = await api.events.post({}, { events: [d2Event] }).getData();
 
             if (response.status === "OK") {
+                //Render logic
                 snackbar.success(`Quantity ${editedQuantity} for ${editedEvent.title} saved`);
             } else {
                 snackbar.error(
@@ -245,7 +238,7 @@ export const ProductsPage: React.FC = React.memo(() => {
         }
     }
 
-    function handleChangeQuantity(
+    function handleChangeQuantity( //bussiness rule
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ): void {
         const isValidNumber = !isNaN(+event.target.value);
@@ -267,10 +260,11 @@ export const ProductsPage: React.FC = React.memo(() => {
     }
 
     return (
+        //render
         <Container>
             <Typography variant="h4">{i18n.t("Products")}</Typography>
 
-            <ObjectsList<ProgramEvent>
+            <ObjectsList<ProductView>
                 {...tableProps}
                 columns={tableProps.columns}
                 onChangeSearch={undefined}
@@ -299,24 +293,6 @@ export const ProductsPage: React.FC = React.memo(() => {
     );
 });
 
-function buildProgramEvent(event: Event): ProgramEvent {
-    return {
-        id: event.event,
-        title: event.dataValues.find(dv => dv.dataElement === dataElements.title)?.value || "",
-        image: event.dataValues.find(dv => dv.dataElement === dataElements.image)?.value || "",
-        quantity: +(
-            event.dataValues.find(dv => dv.dataElement === dataElements.quantity)?.value || 0
-        ),
-        status: +(event.dataValues.find(dv => dv.dataElement === dataElements.status)?.value || 0),
-    };
-}
-
-const eventsFields = {
-    event: true,
-    dataValues: { dataElement: true, value: true },
-    eventDate: true,
-} as const;
-
 const Container = styled.div`
     padding: 32px;
 `;
@@ -331,14 +307,3 @@ const StatusContainer = styled.div<{ status: ProductStatus }>`
     border-radius: 20px;
     width: 100px;
 `;
-
-export interface Event {
-    event: string;
-    dataValues: DataValue[];
-    eventDate: string;
-}
-
-export interface DataValue {
-    dataElement: string;
-    value: string;
-}
