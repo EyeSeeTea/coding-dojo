@@ -15,6 +15,8 @@ import i18n from "../../../utils/i18n";
 import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
 import { TextField, Typography } from "@material-ui/core";
 import styled from "styled-components";
+import { ProductStatus, ProgramEvent } from "../../../domain/entities/Product";
+import { buildProgramEvent } from "./ProductViewModel";
 
 const dataElements = {
     title: "qkvNoqnBdPk",
@@ -22,16 +24,6 @@ const dataElements = {
     quantity: "PZ7qxiDlYZ8",
     status: "AUsNzRGzRuC",
 };
-
-interface ProgramEvent {
-    id: string;
-    title: string;
-    image: string;
-    quantity: number;
-    status: number;
-}
-
-type ProductStatus = "active" | "inactive";
 
 export const ProductsPage: React.FC = React.memo(() => {
     const { compositionRoot, currentUser } = useAppContext();
@@ -54,32 +46,25 @@ export const ProductsPage: React.FC = React.memo(() => {
                     return;
                 }
 
-                const api = compositionRoot.api.get;
-
-                const data = await api?.events
-                    .getAll({
-                        fields: eventsFields,
-                        program: "x7s8Yurmj7Q",
-                        event: id,
-                    })
-                    .getData();
-
-                const event = data?.events[0];
+                const events = await compositionRoot.products.getAllEvents.execute(id).toPromise();
+                const event = events[0];
 
                 if (event) {
-                    const events = data?.events.map(buildProgramEvent);
-                    const event = events[0];
+                    const programEvents = events.map(event =>
+                        buildProgramEvent(event, dataElements)
+                    );
+                    const programEvent = programEvents[0];
 
-                    setEditingEventId(data?.events[0]?.event);
-                    setEditingProgramEvent(event);
-                    setEditedQuantity(event?.quantity.toString() || "");
+                    setEditingEventId(event.event);
+                    setEditingProgramEvent(programEvent);
+                    setEditedQuantity(programEvent?.quantity.toString() || "");
                     setShowEditQuantityDialog(true);
                 } else {
                     snackbar.error(`Event with id ${id} not found`);
                 }
             }
         },
-        [compositionRoot.api.get, currentUser, snackbar]
+        [compositionRoot.products.getAllEvents, currentUser, snackbar]
     );
 
     const baseConfig: TableConfig<ProgramEvent> = useMemo(
@@ -99,7 +84,6 @@ export const ProductsPage: React.FC = React.memo(() => {
                         return <img src={url} alt={event.title} width={100} />;
                     },
                 },
-
                 {
                     name: "quantity",
                     text: i18n.t("Quantity"),
@@ -149,35 +133,21 @@ export const ProductsPage: React.FC = React.memo(() => {
                 paging: TablePagination,
                 sorting: TableSorting<ProgramEvent>
             ) => {
-                const api = compositionRoot.api.get;
-
-                const data = await api?.events
-                    .get({
-                        fields: eventsFields,
-                        program: "x7s8Yurmj7Q",
-                        page: paging.page,
-                        pageSize: paging.pageSize,
-                        order: `${sorting.field}:${sorting.order}`,
+                const { pager, objects } = await compositionRoot.products.getProductList
+                    .execute({
+                        paging,
+                        sorting: { field: sorting.field, direction: sorting.order },
                     })
-                    .getData();
-
-                const events = data?.events.map(buildProgramEvent);
-
-                const emptyPager = {
-                    page: 1,
-                    pageCount: 1,
-                    total: 0,
-                    pageSize: 10,
-                };
+                    .toPromise();
 
                 console.debug("Reloading", reloadKey);
 
                 return {
-                    pager: data?.pager || emptyPager,
-                    objects: events || [],
+                    pager,
+                    objects: objects.map(object => buildProgramEvent(object, dataElements)),
                 };
             },
-        [compositionRoot.api.get, reloadKey]
+        [compositionRoot.products.getProductList, reloadKey]
     );
 
     const tableProps = useObjectsTable(baseConfig, getRows);
@@ -191,32 +161,23 @@ export const ProductsPage: React.FC = React.memo(() => {
     }
 
     async function saveEditQuantity(): Promise<void> {
-        const api = compositionRoot.api.get;
-
-        if (editingProgramEvent && api) {
+        if (editingProgramEvent) {
             const quantity = +(editedQuantity || "0");
-
             const editedEvent: ProgramEvent = {
                 ...editingProgramEvent,
                 quantity,
                 status: quantity === 0 ? 0 : 1,
             };
 
-            const data = await api?.events
-                .getAll({
-                    fields: { $all: true },
-                    program: "x7s8Yurmj7Q",
-                    event: editingEventId,
-                })
-                .getData();
-
-            const editingD2Event = data.events[0];
-
+            const d2Events = await compositionRoot.products.getAllEvents
+                .execute(editingEventId)
+                .toPromise();
+            const editingD2Event = d2Events[0];
             if (!editingD2Event) return;
 
             const d2Event = {
                 ...editingD2Event,
-                dataValues: editingD2Event?.dataValues.map(dv => {
+                dataValues: editingD2Event.dataValues.map(dv => {
                     if (dv.dataElement === dataElements.quantity) {
                         return { ...dv, value: editedEvent.quantity };
                     } else if (dv.dataElement === dataElements.status) {
@@ -227,9 +188,9 @@ export const ProductsPage: React.FC = React.memo(() => {
                 }),
             };
 
-            const response = await api.events.post({}, { events: [d2Event] }).getData();
+            const response = await compositionRoot.products.save.execute(d2Event).toPromise();
 
-            if (response.status === "OK") {
+            if (response === true) {
                 snackbar.success(`Quantity ${editedQuantity} for ${editedEvent.title} saved`);
             } else {
                 snackbar.error(
@@ -299,24 +260,6 @@ export const ProductsPage: React.FC = React.memo(() => {
     );
 });
 
-function buildProgramEvent(event: Event): ProgramEvent {
-    return {
-        id: event.event,
-        title: event.dataValues.find(dv => dv.dataElement === dataElements.title)?.value || "",
-        image: event.dataValues.find(dv => dv.dataElement === dataElements.image)?.value || "",
-        quantity: +(
-            event.dataValues.find(dv => dv.dataElement === dataElements.quantity)?.value || 0
-        ),
-        status: +(event.dataValues.find(dv => dv.dataElement === dataElements.status)?.value || 0),
-    };
-}
-
-const eventsFields = {
-    event: true,
-    dataValues: { dataElement: true, value: true },
-    eventDate: true,
-} as const;
-
 const Container = styled.div`
     padding: 32px;
 `;
@@ -331,14 +274,3 @@ const StatusContainer = styled.div<{ status: ProductStatus }>`
     border-radius: 20px;
     width: 100px;
 `;
-
-export interface Event {
-    event: string;
-    dataValues: DataValue[];
-    eventDate: string;
-}
-
-export interface DataValue {
-    dataElement: string;
-    value: string;
-}
