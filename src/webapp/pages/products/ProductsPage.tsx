@@ -7,7 +7,6 @@ import {
     useObjectsTable,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
-
 import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { useAppContext } from "../../contexts/app-context";
 import { useReload } from "../../hooks/use-reload";
@@ -27,15 +26,14 @@ export const ProductsPage: React.FC = React.memo(() => {
     const [editedQuantity, setEditedQuantity] = useState<string | undefined>(undefined);
     const [quantityError, setQuantityError] = useState<string | undefined>(undefined);
 
-    const updatingQuantity = useCallback(
-        async (id: string) => {
-            console.debug("updatingQuantity" + id);
-            if (id) {
+    const updateQuantity = useCallback(
+        async (productId: string) => {
+            if (productId) {
                 if (!currentUser.isAdmin()) {
-                    snackbar.error(i18n.t("Only admin users can edit quantity od a product"));
+                    snackbar.error(i18n.t("Only admin users can edit quantity of a product"));
                     return;
                 }
-                compositionRoot.products.getProduct.execute(id).run(
+                compositionRoot.products.getProduct.execute(productId).run(
                     product => {
                         setProductBeingEdited(product);
                         setShowEditQuantityDialog(true);
@@ -62,9 +60,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                     text: i18n.t("Image"),
                     sortable: false,
                     getValue: event => {
-                        //TO DO : MOVE TO REPO
-                        const url = `${compositionRoot.api.get?.baseUrl}/api/events/files?dataElementUid=m1yv8j2av5I&eventUid=${event.id}`;
-                        return <img src={url} alt={event.title} width={100} />;
+                        return <img src={event.image} alt={event.title} width={100} />;
                     },
                 },
 
@@ -94,7 +90,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                     text: i18n.t("Update Quantity"),
                     icon: <SystemUpdateAltIcon />,
                     onClick: (selectedIds: string[]) => {
-                        updatingQuantity(selectedIds[0] || "");
+                        updateQuantity(selectedIds[0] || "");
                     },
                 },
             ],
@@ -107,7 +103,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                 pageSizeInitialValue: 10,
             },
         }),
-        [compositionRoot.api.get?.baseUrl, updatingQuantity]
+        [updateQuantity]
     );
 
     const getProductRows = useCallback(
@@ -134,7 +130,7 @@ export const ProductsPage: React.FC = React.memo(() => {
         setQuantityError(undefined);
     }
 
-    async function saveEditQuantity(): Promise<void> {
+    function saveEditQuantity(): void {
         if (productBeingEdited) {
             const updatedQuantity = +(editedQuantity || "0");
             const updatedProduct: Product = {
@@ -153,7 +149,7 @@ export const ProductsPage: React.FC = React.memo(() => {
                 },
                 err => {
                     snackbar.error(
-                        `An error has ocurred saving quantity ${editedQuantity} for ${updatedProduct.title} ${err.message}`
+                        `An error has ocurred saving quantity ${editedQuantity} for ${updatedProduct.title} : ${err.message}`
                     );
                     setShowEditQuantityDialog(false);
                     setProductBeingEdited(undefined);
@@ -199,7 +195,6 @@ export const ProductsPage: React.FC = React.memo(() => {
                 title={i18n.t("Update Quantity")}
                 onCancel={cancelEditQuantity}
                 cancelText={i18n.t("Cancel")}
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onSave={saveEditQuantity}
                 saveText={i18n.t("Save")}
                 maxWidth="xs"

@@ -83,10 +83,11 @@ export class ProductsD2Repository implements ProductsRepository {
         const evtQty = +(
             event.dataValues.find(dv => dv.dataElement === dataElements.quantity)?.value || 0
         );
+        const imageUrl = `${this.api.baseUrl}/api/events/files?dataElementUid=${dataElements.image}&eventUid=${event.event}`;
         return {
             id: event.event,
             title: event.dataValues.find(dv => dv.dataElement === dataElements.title)?.value || "",
-            image: event.dataValues.find(dv => dv.dataElement === dataElements.image)?.value || "",
+            image: imageUrl,
             quantity: evtQty,
             status: evtQty > 0 ? "active" : "inactive",
         };
@@ -99,7 +100,7 @@ const eventsFields = {
     eventDate: true,
 } as const;
 
-//TO DO - how to relate data value to property of prodict
+//TO DO : Fetch form datatstore to make it configurable.
 const dataElements = {
     title: "qkvNoqnBdPk",
     image: "m1yv8j2av5I",
