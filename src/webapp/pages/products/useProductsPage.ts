@@ -1,9 +1,9 @@
 import React, { ChangeEvent, useState } from "react";
 import { useAppContext } from "../../contexts/app-context";
 import { TablePagination, TableSorting, useSnackbar } from "@eyeseetea/d2-ui-components";
-import { ProgramEvent, buildProgramEvent, dataElements, eventsFields } from "./ProductsPage";
 import { useReload } from "../../hooks/use-reload";
 import i18n from "../../../utils/i18n";
+import { Product, getProductStatus, isQuantityValid } from "../../../domain/entities/Product";
 
 const emptyPager = {
     page: 1,
@@ -19,49 +19,29 @@ export function useProductsPage() {
     const snackbar = useSnackbar();
 
     // State
-    const [productsList, setProductsList] = useState<ProgramEvent[] | undefined>(undefined);
+    const [productsList, setProductsList] = useState<Product[] | undefined>(undefined);
     const [pager, setPager] = useState<Record<string, any>>(emptyPager);
 
     const [showEditQuantityDialog, setShowEditQuantityDialog] = useState(false);
-    const [editingProgramEvent, setEditingProgramEvent] = useState<ProgramEvent | undefined>(
-        undefined
-    );
-    const [editingEventId, setEditingEventId] = useState<string | undefined>(undefined);
-    const [editedQuantity, setEditedQuantity] = useState<string | undefined>(undefined);
+    const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
+    const [editingProductId, setEditingProductId] = useState<string | undefined>(undefined);
+    const [editedQuantity, setEditedQuantity] = useState<number | undefined>(undefined);
     const [quantityError, setQuantityError] = useState<string | undefined>(undefined);
 
     const getRows = React.useMemo(
-        () =>
-            async (
-                _search: string,
-                paging: TablePagination,
-                sorting: TableSorting<ProgramEvent>
-            ) => {
-                const api = compositionRoot.api.get;
+        () => async (_search: string, paging: TablePagination, sorting: TableSorting<Product>) => {
+            const response = await compositionRoot.product.getList
+                .execute(paging, sorting)
+                .toPromise();
 
-                const data = await api?.events
-                    .get({
-                        fields: eventsFields,
-                        program: "x7s8Yurmj7Q",
-                        page: paging.page,
-                        pageSize: paging.pageSize,
-                        order: `${sorting.field}:${sorting.order}`,
-                    })
-                    .getData();
+            console.debug("Reloading", reloadKey);
 
-                const events = data?.events.map(buildProgramEvent);
+            setProductsList(response.objects);
+            setPager(response.pager);
 
-                console.debug("Reloading", reloadKey);
-
-                setProductsList(events || []);
-                setPager(data?.pager || emptyPager);
-
-                return {
-                    pager: data?.pager || emptyPager,
-                    objects: events || [],
-                };
-            },
-        [compositionRoot.api.get, reloadKey]
+            return response;
+        },
+        [compositionRoot.product.getList, reloadKey]
     );
 
     const updatingQuantity = React.useCallback(
@@ -71,137 +51,83 @@ export function useProductsPage() {
                     snackbar.error(i18n.t("Only admin users can edit quantity od a product"));
                     return;
                 }
+                const product = await compositionRoot.product.get.execute(id).toPromise();
 
-                const api = compositionRoot.api.get;
-
-                const data = await api?.events
-                    .getAll({
-                        fields: eventsFields,
-                        program: "x7s8Yurmj7Q",
-                        event: id,
-                    })
-                    .getData();
-
-                const event = data?.events[0];
-
-                if (event) {
-                    const events = data?.events.map(buildProgramEvent);
-                    const event = events[0];
-
-                    setEditingEventId(data?.events[0]?.event);
-                    setEditingProgramEvent(event);
-                    setEditedQuantity(event?.quantity.toString() || "");
+                if (product) {
+                    setEditingProductId(product.id);
+                    setEditingProduct(product);
+                    setEditedQuantity(product?.quantity || 0);
                     setShowEditQuantityDialog(true);
                 } else {
-                    snackbar.error(`Event with id ${id} not found`);
+                    snackbar.error(`Product with id ${id} not found`);
                 }
             }
         },
-        [compositionRoot.api.get, currentUser, snackbar]
+        [compositionRoot.product.get, currentUser, snackbar]
     );
 
     const cancelEditQuantity = React.useCallback(() => {
         setShowEditQuantityDialog(false);
-        setEditingEventId(undefined);
+        setEditingProductId(undefined);
         setEditedQuantity(undefined);
-        setEditingProgramEvent(undefined);
+        setEditingProduct(undefined);
         setQuantityError(undefined);
     }, []);
 
     const saveEditQuantity = React.useCallback(async () => {
-        const api = compositionRoot.api.get;
-
-        if (editingProgramEvent && api) {
-            const quantity = +(editedQuantity || "0");
-
-            const editedEvent: ProgramEvent = {
-                ...editingProgramEvent,
-                quantity,
-                status: quantity === 0 ? 0 : 1,
+        if (editingProduct && editedQuantity !== undefined) {
+            const editedProduct: Product = {
+                ...editingProduct,
+                quantity: editedQuantity,
+                status: getProductStatus(editedQuantity),
             };
 
-            const data = await api?.events
-                .getAll({
-                    fields: { $all: true },
-                    program: "x7s8Yurmj7Q",
-                    event: editingEventId,
-                })
-                .getData();
+            const response = await compositionRoot.product.update
+                .execute(editedProduct)
+                .toPromise();
 
-            const editingD2Event = data.events[0];
-
-            if (!editingD2Event) return;
-
-            const d2Event = {
-                ...editingD2Event,
-                dataValues: editingD2Event?.dataValues.map(dv => {
-                    if (dv.dataElement === dataElements.quantity) {
-                        return { ...dv, value: editedEvent.quantity };
-                    } else if (dv.dataElement === dataElements.status) {
-                        return { ...dv, value: editedEvent.status };
-                    } else {
-                        return dv;
-                    }
-                }),
-            };
-
-            const response = await api.events.post({}, { events: [d2Event] }).getData();
-
-            if (response.status === "OK") {
-                snackbar.success(`Quantity ${editedQuantity} for ${editedEvent.title} saved`);
+            if (response === "OK") {
+                snackbar.success(`Quantity ${editedQuantity} for ${editedProduct.title} saved`);
             } else {
                 snackbar.error(
-                    `An error has ocurred saving quantity ${editedQuantity} for ${editedEvent.title}`
+                    `An error has ocurred saving quantity ${editedQuantity} for ${editedProduct.title}`
                 );
             }
 
             setShowEditQuantityDialog(false);
-            setEditingEventId(undefined);
-            setEditingProgramEvent(undefined);
+            setEditingProductId(undefined);
+            setEditingProduct(undefined);
             setEditedQuantity(undefined);
             reload();
         }
-    }, [
-        compositionRoot.api.get,
-        editedQuantity,
-        editingEventId,
-        editingProgramEvent,
-        reload,
-        snackbar,
-    ]);
+    }, [compositionRoot.product.update, editedQuantity, editingProduct, reload, snackbar]);
 
     const handleChangeQuantity = React.useCallback(
         (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            const isValidNumber = !isNaN(+event.target.value);
-
-            if (!isValidNumber) {
-                setQuantityError("Only numbers are allowed");
-                setEditedQuantity(event.target.value);
+            const newQuantity = +event.target.value;
+            if (!isQuantityValid(newQuantity)) {
+                setQuantityError("Only positive numbers are allowed");
+                setEditedQuantity(editingProduct?.quantity);
             } else {
-                const value = Number(event.target.value);
-
-                if (value < 0) {
-                    setQuantityError("Only positive numbers are allowed");
-                } else {
-                    setQuantityError(undefined);
-                }
-
-                setEditedQuantity(event.target.value);
+                setQuantityError(undefined);
+                setEditedQuantity(newQuantity);
             }
         },
-        []
+        [editingProduct?.quantity]
     );
 
     return {
+        productsList,
+        pager,
         getRows,
         updatingQuantity,
         setShowEditQuantityDialog,
-        setEditingEventId,
+        setEditingProductId,
         setEditedQuantity,
-        setEditingProgramEvent,
+        setEditingProduct,
         setQuantityError,
-        editingEventId,
-        editingProgramEvent,
+        editingProductId,
+        editingProduct,
         editedQuantity,
         showEditQuantityDialog,
         quantityError,

@@ -12,6 +12,7 @@ import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
 import { TextField, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { useProductsPage } from "./useProductsPage";
+import { Product, ProductStatus } from "../../../domain/entities/Product";
 
 export const dataElements = {
     title: "qkvNoqnBdPk",
@@ -19,17 +20,6 @@ export const dataElements = {
     quantity: "PZ7qxiDlYZ8",
     status: "AUsNzRGzRuC",
 };
-
-// TODO: cambiar por Product
-export interface ProgramEvent {
-    id: string;
-    title: string;
-    image: string;
-    quantity: number;
-    status: number;
-}
-
-type ProductStatus = "active" | "inactive";
 
 export const ProductsPage: React.FC = React.memo(() => {
     const {
@@ -45,7 +35,7 @@ export const ProductsPage: React.FC = React.memo(() => {
 
     const { compositionRoot } = useAppContext();
 
-    const baseConfig: TableConfig<ProgramEvent> = useMemo(
+    const baseConfig: TableConfig<Product> = useMemo(
         () => ({
             columns: [
                 {
@@ -73,11 +63,9 @@ export const ProductsPage: React.FC = React.memo(() => {
                     text: i18n.t("Status"),
                     sortable: false,
                     getValue: event => {
-                        const status = event.status === 0 ? "inactive" : "active";
-
                         return (
-                            <StatusContainer status={status}>
-                                <Typography variant="body1">{status}</Typography>
+                            <StatusContainer status={event.status}>
+                                <Typography variant="body1">{event.status}</Typography>
                             </StatusContainer>
                         );
                     },
@@ -111,7 +99,7 @@ export const ProductsPage: React.FC = React.memo(() => {
         <Container>
             <Typography variant="h4">{i18n.t("Products")}</Typography>
 
-            <ObjectsList<ProgramEvent>
+            <ObjectsList<Product>
                 {...tableProps}
                 columns={tableProps.columns}
                 onChangeSearch={undefined}
@@ -140,24 +128,6 @@ export const ProductsPage: React.FC = React.memo(() => {
     );
 });
 
-export function buildProgramEvent(event: Event): ProgramEvent {
-    return {
-        id: event.event,
-        title: event.dataValues.find(dv => dv.dataElement === dataElements.title)?.value || "",
-        image: event.dataValues.find(dv => dv.dataElement === dataElements.image)?.value || "",
-        quantity: +(
-            event.dataValues.find(dv => dv.dataElement === dataElements.quantity)?.value || 0
-        ),
-        status: +(event.dataValues.find(dv => dv.dataElement === dataElements.status)?.value || 0),
-    };
-}
-
-export const eventsFields = {
-    event: true,
-    dataValues: { dataElement: true, value: true },
-    eventDate: true,
-} as const;
-
 const Container = styled.div`
     padding: 32px;
 `;
@@ -172,14 +142,3 @@ const StatusContainer = styled.div<{ status: ProductStatus }>`
     border-radius: 20px;
     width: 100px;
 `;
-
-export interface Event {
-    event: string;
-    dataValues: DataValue[];
-    eventDate: string;
-}
-
-export interface DataValue {
-    dataElement: string;
-    value: string;
-}
