@@ -1,81 +1,93 @@
-import { Product } from "../../domain/entities/Product";
+import _ from "lodash";
+import { Product, ProductStatus } from "../../domain/entities/Product";
 import { ProductExportRepository } from "../../domain/entities/ProductExportRepository";
-import ExcelJS from "exceljs";
+import ExcelJS, { Workbook, Worksheet } from "exceljs";
 
 export class ProductExportSpreadsheetRepository implements ProductExportRepository {
-    async export(name: string, products: Product[]): Promise<void> {
+    async export(filename: string, products: Product[]): Promise<void> {
         // Create workbook
-        const wb = new ExcelJS.Workbook();
+        const workBook = new ExcelJS.Workbook();
 
-        // Get unique products
-        let prs: Product[] = [];
-        products.forEach(p => {
-            if (prs.some(pr => pr.equals(p))) return;
-            prs.push(p);
-        });
+        const sortedUniqueProducts: Product[] = filterUniqueProductsSorted(products);
 
-        // Sort products by title
-        prs.sort((a, b) => {
-            if (a.title < b.title) {
-                return -1;
-            }
-            if (a.title > b.title) {
-                return 1;
-            }
-            return 0;
-        });
+        const activeProducts = filterProductsByStatus(sortedUniqueProducts, "active");
+        const activeProductWorkSheet = addWorkSheet(workBook, "Active Products");
 
-        // add worksheet for active products
-        const sh = wb.addWorksheet("Active Products");
+        addRowHeader(activeProductWorkSheet);
+        addRows(activeProductWorkSheet, activeProducts);
 
-        // Add row header
-        sh.addRow(["Id", "Title", "Quantity", "Status"]);
+        const inactiveProducts = filterProductsByStatus(sortedUniqueProducts, "inactive");
+        const inactiveProductWorkSheet = addWorkSheet(workBook, "Inactive Products");
 
-        prs.forEach(p => {
-            if (p.status === "active") {
-                sh.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
+        addRowHeader(inactiveProductWorkSheet);
+        addRows(inactiveProductWorkSheet, inactiveProducts);
 
-        // add worksheet for inactive products
-        const sh2 = wb.addWorksheet("Inactive Products");
+        const summaryWorkSheet = workBook.addWorksheet("Summary");
 
-        // Add row header
-        sh2.addRow(["Id", "Title", "Quantity", "Status"]);
+        summaryWorkSheet.addRow([
+            "# Products",
+            "# Items total",
+            "# Items active",
+            "# Items inactive",
+        ]);
 
-        prs.forEach(p => {
-            if (p.status === "inactive") {
-                sh2.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
+        const totalQuantityProducts = getTotalQuantityProducts(sortedUniqueProducts);
 
-        // Add sheet summary
-        const sh3 = wb.addWorksheet("Summary");
+        const totalQuantityInactiveProducts = getTotalQuantityProducts(inactiveProducts);
 
-        let total = 0;
-        let act = 0;
-        let inctv = 0;
+        const totalQuantityActiveProducts = getTotalQuantityProducts(activeProducts);
 
-        prs.forEach(p => {
-            total += p.quantity.value;
-            if (p.status === "active") {
-                act += p.quantity.value;
-            }
-            if (p.status === "inactive") {
-                inctv += p.quantity.value;
-            }
-        });
-
-        sh3.addRow(["# Products", "# Items total", "# Items active", "# Items inactive"]);
-        sh3.addRow([
-            // If a value is zero, render an empty cell instead
-            prs.length > 0 ? prs.length : undefined,
-            total > 0 ? total : undefined,
-            act > 0 ? act : undefined,
-            inctv > 0 ? act : undefined,
+        summaryWorkSheet.addRow([
+            changeZeroToUndefined(sortedUniqueProducts.length),
+            changeZeroToUndefined(totalQuantityProducts),
+            changeZeroToUndefined(totalQuantityActiveProducts),
+            changeZeroToUndefined(totalQuantityInactiveProducts),
         ]);
 
         // Write xlsx file
-        await wb.xlsx.writeFile(name);
+        await workBook.xlsx.writeFile(filename);
+
+        console.log(sortedUniqueProducts.length);
+        console.log(sortedUniqueProducts);
+        console.log(totalQuantityProducts);
     }
+}
+
+function changeZeroToUndefined(quantity: number) {
+    return quantity > 0 ? quantity : undefined;
+}
+
+function addRowHeader(sheet: ExcelJS.Worksheet) {
+    sheet.addRow(["Id", "Title", "Quantity", "Status"]);
+}
+
+function addRow(sheet: ExcelJS.Worksheet, product: Product) {
+    sheet.addRow([product.id, product.title, product.quantity.value, product.status]);
+}
+
+function addRows(sheet: ExcelJS.Worksheet, products: Product[]) {
+    for (const product of products) {
+        //addRow(sheet, product)
+        sheet.addRow([product.id, product.title, product.quantity.value, product.status]);
+    }
+}
+
+function addWorkSheet(workBook: Workbook, title: string): Worksheet {
+    return workBook.addWorksheet(title);
+}
+function filterProductsByStatus(products: Product[], status: ProductStatus): Product[] {
+    return products.filter(product => product.status === status);
+}
+
+function filterUniqueProductsSorted(products: Product[]) {
+    return _.sortBy(
+        _.uniqBy([...products], product => product.id),
+        ["title"]
+    );
+}
+
+function getTotalQuantityProducts(products: Product[]): number {
+    return products.reduce((acumulativeTotal, p) => {
+        return acumulativeTotal + p.quantity.value;
+    }, 0);
 }
