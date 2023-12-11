@@ -1,53 +1,41 @@
+import ExcelJS, { Workbook, Worksheet } from "exceljs";
+import _ from "lodash";
 import { Product } from "../../domain/entities/Product";
 import { ProductExportRepository } from "../../domain/entities/ProductExportRepository";
-import ExcelJS from "exceljs";
 
 export class ProductExportSpreadsheetRepository implements ProductExportRepository {
     async export(name: string, products: Product[]): Promise<void> {
-        // Create workbook
         const workbook = new ExcelJS.Workbook();
 
         // Get unique products
-        const uniqueProducts: Product[] = [];
-        products.forEach(product => {
-            if (uniqueProducts.some(product => product.equals(product))) return;
-            uniqueProducts.push(product);
-        });
+        const uniqueProducts = _.uniqWith(products, (productA, productB) =>
+            productA.equals(productB)
+        );
 
         // Sort products by title
-        uniqueProducts.sort((a, b) => {
-            if (a.title < b.title) {
-                return -1;
-            }
-            if (a.title > b.title) {
-                return 1;
-            }
-            return 0;
-        });
+        const sortedUniqueProducts = _.sortBy(uniqueProducts, product => product.title);
 
         // add worksheet for active products
-        const activeProductsSheet = workbook.addWorksheet("Active Products");
-
-        // Add row header
-        activeProductsSheet.addRow(["Id", "Title", "Quantity", "Status"]);
-
-        uniqueProducts.forEach(p => {
-            if (p.status === "active") {
-                activeProductsSheet.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
+        const activeProductsRows = products
+            .filter(product => product.status === "active")
+            .map(product => [product.id, product.title, product.quantity.value, product.status]);
+        const activeProductsSheet = this.addSheet(
+            "Active Products",
+            ["Id", "Title", "Quantity", "Status"],
+            activeProductsRows,
+            workbook
+        );
 
         // add worksheet for inactive products
-        const inactiveProductsSheet = workbook.addWorksheet("Inactive Products");
-
-        // Add row header
-        inactiveProductsSheet.addRow(["Id", "Title", "Quantity", "Status"]);
-
-        uniqueProducts.forEach(p => {
-            if (p.status === "inactive") {
-                inactiveProductsSheet.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
+        const inactiveProductsRows = products
+            .filter(product => product.status === "inactive")
+            .map(product => [product.id, product.title, product.quantity.value, product.status]);
+        const inactiveProductsSheet = this.addSheet(
+            "Inactive Products",
+            ["Id", "Title", "Quantity", "Status"],
+            inactiveProductsRows,
+            workbook
+        );
 
         // Add sheet summary
         const summarySheet = workbook.addWorksheet("Summary");
@@ -56,7 +44,7 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         let active = 0;
         let inactive = 0;
 
-        uniqueProducts.forEach(product => {
+        sortedUniqueProducts.forEach(product => {
             total += product.quantity.value;
             if (product.status === "active") {
                 active += product.quantity.value;
@@ -69,7 +57,7 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         summarySheet.addRow(["# Products", "# Items total", "# Items active", "# Items inactive"]);
         summarySheet.addRow([
             // If a value is zero, render an empty cell instead
-            uniqueProducts.length > 0 ? uniqueProducts.length : undefined,
+            sortedUniqueProducts.length > 0 ? sortedUniqueProducts.length : undefined,
             total > 0 ? total : undefined,
             active > 0 ? active : undefined,
             inactive > 0 ? active : undefined,
@@ -77,5 +65,23 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
 
         // Write xlsx file
         await workbook.xlsx.writeFile(name);
+    }
+
+    private addRowByStatus(sheet: Worksheet, products: Product[], status: "active" | "inactive") {
+        products.forEach(product => {
+            if (product.status === status) {
+                sheet.addRow([product.id, product.title, product.quantity.value, product.status]);
+            }
+        });
+
+        return sheet;
+    }
+
+    private addSheet(name: string, headers: string[], rows: any[], workbook: Workbook) {
+        const sheet = workbook.addWorksheet(name);
+        sheet.addRow(headers);
+        rows.forEach(item => sheet.addRow(item));
+
+        return sheet;
     }
 }
