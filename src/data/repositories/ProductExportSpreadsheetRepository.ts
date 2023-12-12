@@ -28,14 +28,14 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         const activeProductsQuantity = this.getSumByStatus(uniqueProducts, "active");
         const inactiveProductsQuantity = this.getSumByStatus(uniqueProducts, "inactive");
 
-        const summaryRows = [
+        const summaryRow = [
             this.emptyCellIfZero(uniqueProducts.length),
             this.emptyCellIfZero(totalProductsQuantity),
             this.emptyCellIfZero(activeProductsQuantity),
             this.emptyCellIfZero(inactiveProductsQuantity),
         ];
 
-        this.addSheetToWorkbook("Summary", headers.summary, summaryRows, workbook);
+        this.addSheetToWorkbook("Summary", headers.summary, [summaryRow], workbook);
 
         await workbook.xlsx.writeFile(name);
     }
