@@ -1,7 +1,7 @@
 import _ from "lodash";
 import ExcelJS, { Workbook } from "exceljs";
 import { Product } from "../../domain/entities/Product";
-import { ProductExportRepository } from "../../domain/entities/ProductExportRepository";
+import { ProductExportRepository } from "../../domain/repositories/ProductExportRepository";
 
 export class ProductExportSpreadsheetRepository implements ProductExportRepository {
     async export(name: string, products: Product[]): Promise<void> {
