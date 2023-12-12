@@ -108,7 +108,8 @@
         "localize": "yarn update-po && d2-i18n-generate -n dhis2-skeleton-app -p ./i18n/ -o ./src/locales/",
         "update-po": "yarn extract-pot && find i18n/ -name '*.po' -exec msgmerge --backup=off -U {} i18n/en.pot \\;",
         "prepare": "husky install",
-        "script-example": "npx ts-node src/scripts/example.ts"
+        "script-example": "npx ts-node src/scripts/example.ts",
+        "export-products": "npx ts-node src/scripts/export-products.ts"
     },
     "manifest.webapp": {
         "name": "DHIS2 Skeleton App",
