@@ -13,10 +13,10 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
 
         const sortedUniqueProducts = _.sortBy(uniqueProducts, product => product.title);
 
-        const activeProductsRows = this.getRowsByStatus(products, "active");
+        const activeProductsRows = this.getRowsByStatus(sortedUniqueProducts, "active");
         this.addSheetToWorkbook("Active Products", headers.status, activeProductsRows, workbook);
 
-        const inactiveProductsRows = this.getRowsByStatus(products, "inactive");
+        const inactiveProductsRows = this.getRowsByStatus(sortedUniqueProducts, "inactive");
         this.addSheetToWorkbook(
             "Inactive Products",
             headers.status,
