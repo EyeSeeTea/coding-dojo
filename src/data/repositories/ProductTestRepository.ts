@@ -18,6 +18,11 @@ export class ProductTestRepository implements ProductRepository {
             objects: [],
         });
     }
+
+    getAllProducts(): FutureData<Product[]> {
+        return Future.success([]);
+    }
+
     getProduct(_Id: string): FutureData<Product> {
         return Future.error(new Error("Product not found"));
     }

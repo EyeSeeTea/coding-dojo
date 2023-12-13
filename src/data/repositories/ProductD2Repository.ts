@@ -35,6 +35,19 @@ export class ProductD2Repository implements ProductRepository {
         });
     }
 
+    getAllProducts(): FutureData<Product[]> {
+        return apiToFuture(
+            this.api.events.getAll({
+                fields: eventsFields,
+                program: "x7s8Yurmj7Q",
+            })
+        ).map(response => {
+            const events = response.events.map(event => this.buildProduct(event));
+
+            return events;
+        });
+    }
+
     getProduct(id: string): FutureData<Product> {
         return this.getEvent(id).map(event => this.buildProduct(event));
     }
