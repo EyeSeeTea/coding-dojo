@@ -1,81 +1,114 @@
-import { Product } from "../../domain/entities/Product";
+import { Product, ProductStatus } from "../../domain/entities/Product";
 import { ProductExportRepository } from "../../domain/entities/ProductExportRepository";
 import ExcelJS from "exceljs";
+import _ from "./../../domain/entities/generic/Collection";
+import { FutureData } from "../api-futures";
+import { Future } from "../../domain/entities/generic/Future";
+import { string } from "cmd-ts";
+
+const DEFAULT_COLUMNS = ["Id", "Title", "Quantity", "Status"];
 
 export class ProductExportSpreadsheetRepository implements ProductExportRepository {
-    async export(name: string, products: Product[]): Promise<void> {
-        // Create workbook
-        const wb = new ExcelJS.Workbook();
+    export(name: string, products: Product[]): FutureData<void> {
+        const uniqueProducts = this.getUniqueProducts(products);
+        const productsSortedByTitle = this.sortProductsByTitle(uniqueProducts);
+        const activeProducts = this.getProductsByStatus(productsSortedByTitle, "active");
+        const inactiveProducts = this.getProductsByStatus(productsSortedByTitle, "inactive");
 
-        // Get unique products
-        let prs: Product[] = [];
-        products.forEach(p => {
-            if (prs.some(pr => pr.equals(p))) return;
-            prs.push(p);
+        const spreadSheetDocument = this.generateProductSpreadSheet(
+            name,
+            activeProducts,
+            inactiveProducts,
+            products
+        );
+
+        return this.exportToSpreadSheet(spreadSheetDocument);
+    }
+
+    private generateProductSpreadSheet(
+        name: string,
+        activeProducts: Product[],
+        inactiveProducts: Product[],
+        products: Product[]
+    ): SpreadSheetDocument {
+        return {
+            name: name,
+            sheets: [
+                {
+                    columns: DEFAULT_COLUMNS,
+                    name: "Active Products",
+                    rows: activeProducts.map(p => [p.id, p.title, p.quantity.value, p.status]),
+                },
+                {
+                    columns: DEFAULT_COLUMNS,
+                    name: "Inactive Products",
+                    rows: inactiveProducts.map(p => [p.id, p.title, p.quantity.value, p.status]),
+                },
+                {
+                    columns: ["# Products", "# Items total", "# Items active", "# Items inactive"],
+                    name: "Summary",
+                    rows: [
+                        [
+                            products.length || "",
+                            this.getTotalQuantityOfProducts(products) || "",
+                            this.getTotalQuantityOfProducts(activeProducts) || "",
+                            this.getTotalQuantityOfProducts(inactiveProducts) || "",
+                        ],
+                    ],
+                },
+            ],
+        };
+    }
+
+    private exportToSpreadSheet(spreadSheetDocument: SpreadSheetDocument): FutureData<void> {
+        const workbook = new ExcelJS.Workbook();
+
+        spreadSheetDocument.sheets.forEach(sheet => {
+            const sh = workbook.addWorksheet(sheet.name);
+            sh.addRow(sheet.columns);
+            sh.addRows(sheet.rows);
         });
 
-        // Sort products by title
-        prs.sort((a, b) => {
-            if (a.title < b.title) {
-                return -1;
-            }
-            if (a.title > b.title) {
-                return 1;
-            }
-            return 0;
-        });
+        workbook.xlsx.writeFile(spreadSheetDocument.name);
+        return Future.success(undefined);
+    }
 
-        // add worksheet for active products
-        const sh = wb.addWorksheet("Active Products");
+    private getUniqueProducts(products: Product[]): Product[] {
+        return _(products)
+            .uniqBy(product => product.id)
+            .value();
+    }
 
-        // Add row header
-        sh.addRow(["Id", "Title", "Quantity", "Status"]);
+    private sortProductsByTitle(products: Product[]): Product[] {
+        return _(products)
+            .sortBy(product => product.title)
+            .value();
+    }
 
-        prs.forEach(p => {
-            if (p.status === "active") {
-                sh.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
+    private getProductsByStatus(products: Product[], status: ProductStatus): Product[] {
+        return _(products)
+            .filter(product => product.status === status)
+            .value();
+    }
 
-        // add worksheet for inactive products
-        const sh2 = wb.addWorksheet("Inactive Products");
-
-        // Add row header
-        sh2.addRow(["Id", "Title", "Quantity", "Status"]);
-
-        prs.forEach(p => {
-            if (p.status === "inactive") {
-                sh2.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
-
-        // Add sheet summary
-        const sh3 = wb.addWorksheet("Summary");
-
-        let total = 0;
-        let act = 0;
-        let inctv = 0;
-
-        prs.forEach(p => {
-            total += p.quantity.value;
-            if (p.status === "active") {
-                act += p.quantity.value;
-            }
-            if (p.status === "inactive") {
-                inctv += p.quantity.value;
-            }
-        });
-
-        sh3.addRow(["# Products", "# Items total", "# Items active", "# Items inactive"]);
-        sh3.addRow([
-            // If a value is zero, render an empty cell instead
-            prs.length > 0 ? prs.length : undefined,
-            total > 0 ? total : undefined,
-            act > 0 ? act : undefined,
-            inctv > 0 ? act : undefined,
-        ]);
-
-        // Write xlsx file
-        await wb.xlsx.writeFile(name);
+    private getTotalQuantityOfProducts(products: Product[]): number {
+        const totalQuantity = products.reduce(
+            (total, product) => total + product.quantity.value,
+            0
+        );
+        return totalQuantity;
     }
 }
+
+type SpreadSheetDocument = {
+    name: string;
+    sheets: SpreadSheet[];
+};
+
+type SpreadSheet = {
+    name: SpreadSheetName;
+    columns: string[];
+    rows: (string | number)[][];
+};
+
+type SpreadSheetName = string;

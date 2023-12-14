@@ -6,11 +6,8 @@ import { ProductExportSpreadsheetRepository } from "../data/repositories/Product
 import { ExportProductUseCase } from "../domain/usecases/ExportProductsUseCase";
 
 // Usage:
-// npx ts-node src/scripts/export-products.ts -u "https://dev.eyeseetea.com/play" -a admin:district
+// npx ts-node src/scripts/export-products.ts -u "https://dev.eyeseetea.com/play" -a admin:district -p "./products.xlsx"
 /*
-Repository: https://github.com/EyeSeeTea/coding-dojo
-Branch: kata/declarative-programming
-Dedication time (max): 2h
 
 Apply the concepts seen in this session to: src/data/repositories/ProductExportSpreadsheetRepository.ts
 Create a script src/scripts/export-products.ts (see example.ts) that gets all the products from dev.eyeseetea 
@@ -35,6 +32,12 @@ function main() {
                 short: "a",
                 description: "DHIS2 auth: USERNAME:PASSWORD",
             }),
+            path: option({
+                type: string,
+                long: "path",
+                short: "p",
+                description: "path to save spreadsheet file",
+            }),
         },
         handler: async args => {
             const [username = "", password = ""] = args.auth.split(":");
@@ -45,7 +48,9 @@ function main() {
             });
             const productRepository = new ProductD2Repository(api);
             const exportProductRepository = new ProductExportSpreadsheetRepository();
-            await new ExportProductUseCase(exportProductRepository, productRepository).execute();
+            new ExportProductUseCase(exportProductRepository, productRepository)
+                .execute(args.path)
+                .run(() => console.debug(`Products exported to ${args.path}`), console.error);
         },
     });
 
