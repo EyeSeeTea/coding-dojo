@@ -1,10 +1,10 @@
+import ExcelJS from "exceljs";
+
 import { Product, ProductStatus } from "../../domain/entities/Product";
 import { ProductExportRepository } from "../../domain/entities/ProductExportRepository";
-import ExcelJS from "exceljs";
 import _ from "./../../domain/entities/generic/Collection";
 import { FutureData } from "../api-futures";
 import { Future } from "../../domain/entities/generic/Future";
-import { string } from "cmd-ts";
 
 const DEFAULT_COLUMNS = ["Id", "Title", "Quantity", "Status"];
 
@@ -18,8 +18,7 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         const spreadSheetDocument = this.generateProductSpreadSheet(
             name,
             activeProducts,
-            inactiveProducts,
-            products
+            inactiveProducts
         );
 
         return this.exportToSpreadSheet(spreadSheetDocument);
@@ -28,9 +27,9 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
     private generateProductSpreadSheet(
         name: string,
         activeProducts: Product[],
-        inactiveProducts: Product[],
-        products: Product[]
+        inactiveProducts: Product[]
     ): SpreadSheetDocument {
+        const totalNumberProducts = activeProducts.length + inactiveProducts.length;
         return {
             name: name,
             sheets: [
@@ -49,8 +48,11 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
                     name: "Summary",
                     rows: [
                         [
-                            products.length || "",
-                            this.getTotalQuantityOfProducts(products) || "",
+                            totalNumberProducts || "",
+                            this.getTotalQuantityOfProducts([
+                                ...activeProducts,
+                                ...inactiveProducts,
+                            ]) || "",
                             this.getTotalQuantityOfProducts(activeProducts) || "",
                             this.getTotalQuantityOfProducts(inactiveProducts) || "",
                         ],
