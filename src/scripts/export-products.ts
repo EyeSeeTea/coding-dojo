@@ -3,7 +3,7 @@ import path from "path";
 import { D2Api } from "../types/d2-api";
 import { ProductD2Repository } from "../data/repositories/ProductD2Repository";
 import { ProductExportSpreadsheetRepository } from "../data/repositories/ProductExportSpreadsheetRepository";
-import { ExportProductUseCase } from "../domain/usecases/ExportProductsUseCase";
+import { ExportProductsUseCase } from "../domain/usecases/ExportProductsUseCase";
 
 // Usage:
 // npx ts-node src/scripts/export-products.ts -u "https://dev.eyeseetea.com/play" -a admin:district -p "./products.xlsx"
@@ -48,7 +48,7 @@ function main() {
             });
             const productRepository = new ProductD2Repository(api);
             const exportProductRepository = new ProductExportSpreadsheetRepository();
-            new ExportProductUseCase(exportProductRepository, productRepository)
+            new ExportProductsUseCase(exportProductRepository, productRepository)
                 .execute(args.path)
                 .run(() => console.debug(`Products exported to ${args.path}`), console.error);
         },

@@ -3,7 +3,7 @@ import { ProductExportRepository } from "../entities/ProductExportRepository";
 import { ProductRepository } from "../repositories/ProductRepository";
 import _ from "./../entities/generic/Collection";
 
-export class ExportProductUseCase {
+export class ExportProductsUseCase {
     constructor(
         private productExportRepository: ProductExportRepository,
         private productRepository: ProductRepository
