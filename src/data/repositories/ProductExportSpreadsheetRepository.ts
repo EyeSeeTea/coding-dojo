@@ -5,8 +5,6 @@ import { ProductExportRepository } from "../../domain/repositories/ProductExport
 
 export class ProductExportSpreadsheetRepository implements ProductExportRepository {
     async export(name: string, products: Product[]): Promise<void> {
-        const workbook = new ExcelJS.Workbook();
-
         const uniqueProducts = _.uniqWith(products, (productA, productB) =>
             productA.equals(productB)
         );
@@ -14,15 +12,18 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         const sortedUniqueProducts = _.sortBy(uniqueProducts, product => product.title);
 
         const activeProductsRows = this.getRowsByStatus(sortedUniqueProducts, "active");
-        this.addSheetToWorkbook("Active Products", headers.status, activeProductsRows, workbook);
+        const activeProductsSheet = {
+            title: "Active Products",
+            headers: headers.status,
+            rows: activeProductsRows,
+        };
 
         const inactiveProductsRows = this.getRowsByStatus(sortedUniqueProducts, "inactive");
-        this.addSheetToWorkbook(
-            "Inactive Products",
-            headers.status,
-            inactiveProductsRows,
-            workbook
-        );
+        const inactiveProductsSheet = {
+            title: "Inactive Products",
+            headers: headers.status,
+            rows: inactiveProductsRows,
+        };
 
         const totalProductsQuantity = _.sum(uniqueProducts.map(product => product.quantity.value));
         const activeProductsQuantity = this.getSumByStatus(uniqueProducts, "active");
@@ -35,9 +36,9 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
             this.emptyCellIfZero(inactiveProductsQuantity),
         ];
 
-        this.addSheetToWorkbook("Summary", headers.summary, [summaryRow], workbook);
+        const summarySheet = { title: "Summary", headers: headers.summary, rows: [summaryRow] };
 
-        await workbook.xlsx.writeFile(name);
+        this.createWorkbook(name, [activeProductsSheet, inactiveProductsSheet, summarySheet]);
     }
 
     private getRowsByStatus(products: Product[], status: "active" | "inactive") {
@@ -65,6 +66,22 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
                 .map(product => product.quantity.value)
         );
     }
+
+    private async createWorkbook(name: string, sheets: Sheet[]) {
+        const workbook = new ExcelJS.Workbook();
+        sheets.forEach(sheet =>
+            this.addSheetToWorkbook(sheet.title, sheet.headers, sheet.rows, workbook)
+        );
+        await workbook.xlsx.writeFile(name);
+    }
+}
+
+type Row = any[];
+
+interface Sheet {
+    title: string;
+    headers: Row;
+    rows: Row[];
 }
 
 const headers = {
