@@ -11,6 +11,10 @@ const isEntity = (v: any): v is Entity => {
 export abstract class Entity implements EntityData {
     constructor(public id: Id) {}
 
+    public get uniqueId(): string {
+        return this.id;
+    }
+
     public equals(object?: Entity): boolean {
         if (object === null || object === undefined) {
             return false;

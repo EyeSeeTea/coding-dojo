@@ -33,32 +33,43 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         return {
             name: name,
             sheets: [
-                {
-                    columns: DEFAULT_COLUMNS,
-                    name: "Active Products",
-                    rows: activeProducts.map(p => [p.id, p.title, p.quantity.value, p.status]),
-                },
-                {
-                    columns: DEFAULT_COLUMNS,
-                    name: "Inactive Products",
-                    rows: inactiveProducts.map(p => [p.id, p.title, p.quantity.value, p.status]),
-                },
-                {
-                    columns: ["# Products", "# Items total", "# Items active", "# Items inactive"],
-                    name: "Summary",
-                    rows: [
-                        [
-                            totalNumberProducts || "",
-                            this.getTotalQuantityOfProducts([
-                                ...activeProducts,
-                                ...inactiveProducts,
-                            ]) || "",
-                            this.getTotalQuantityOfProducts(activeProducts) || "",
-                            this.getTotalQuantityOfProducts(inactiveProducts) || "",
-                        ],
-                    ],
-                },
+                this.getProductSheet("Active Products", activeProducts),
+                this.getProductSheet("Inactive Products", inactiveProducts),
+                this.getSummarySheet(totalNumberProducts, activeProducts, inactiveProducts),
             ],
+        };
+    }
+
+    private getSummarySheet(
+        totalNumberProducts: number,
+        activeProducts: Product[],
+        inactiveProducts: Product[]
+    ): SpreadSheet {
+        return {
+            columns: ["# Products", "# Items total", "# Items active", "# Items inactive"],
+            name: "Summary",
+            rows: [
+                [
+                    this.getValueOrEmpty(totalNumberProducts),
+                    this.getValueOrEmpty(
+                        this.getTotalQuantityOfProducts([...activeProducts, ...inactiveProducts])
+                    ),
+                    this.getValueOrEmpty(this.getTotalQuantityOfProducts(activeProducts)),
+                    this.getValueOrEmpty(this.getTotalQuantityOfProducts(inactiveProducts)),
+                ],
+            ],
+        };
+    }
+
+    private getValueOrEmpty(value: number): number | undefined {
+        return value || undefined;
+    }
+
+    private getProductSheet(name: string, products: Product[]): SpreadSheet {
+        return {
+            columns: DEFAULT_COLUMNS,
+            name: name,
+            rows: products.map(p => [p.id, p.title, p.quantity.value, p.status]),
         };
     }
 
@@ -71,13 +82,14 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
             sh.addRows(sheet.rows);
         });
 
-        workbook.xlsx.writeFile(spreadSheetDocument.name);
-        return Future.success(undefined);
+        return Future.fromPromise<Error, void>(workbook.xlsx.writeFile(spreadSheetDocument.name));
     }
 
     private getUniqueProducts(products: Product[]): Product[] {
         return _(products)
-            .uniqBy(product => product.id)
+            .uniqWith((product1, product2) => {
+                return product1.equals(product2);
+            })
             .value();
     }
 
@@ -94,11 +106,9 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
     }
 
     private getTotalQuantityOfProducts(products: Product[]): number {
-        const totalQuantity = products.reduce(
-            (total, product) => total + product.quantity.value,
-            0
-        );
-        return totalQuantity;
+        return _(products)
+            .map(product => product.quantity.value)
+            .sum();
     }
 }
 
@@ -110,7 +120,7 @@ type SpreadSheetDocument = {
 type SpreadSheet = {
     name: SpreadSheetName;
     columns: string[];
-    rows: (string | number)[][];
+    rows: (string | number | undefined)[][];
 };
 
 type SpreadSheetName = string;
