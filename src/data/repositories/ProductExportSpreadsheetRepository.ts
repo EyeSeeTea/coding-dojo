@@ -1,79 +1,105 @@
-import { Product } from "../../domain/entities/Product";
+import { Product, ProductStatus } from "../../domain/entities/Product";
 import { ProductExportRepository } from "../../domain/entities/ProductExportRepository";
 import ExcelJS from "exceljs";
+import _ from "../../domain/entities/generic/Collection";
+import { Id } from "@eyeseetea/d2-api";
 
+type ProductRow = [Id, string, number, ProductStatus];
 export class ProductExportSpreadsheetRepository implements ProductExportRepository {
+    createAndPopulateProductWorksheet(
+        workbook: ExcelJS.Workbook,
+        worksheetName: string,
+        headerColumns: string[],
+        rows: ProductRow[]
+    ) {
+        const sheet = workbook.addWorksheet(worksheetName);
+        sheet.addRow(headerColumns);
+        sheet.addRows(rows);
+    }
+
+    createAndPopulateSummaryWorksheet(
+        workbook: ExcelJS.Workbook,
+        worksheetName: string,
+        headerColumns: string[],
+        row: (number | undefined)[]
+    ) {
+        const sheet = workbook.addWorksheet(worksheetName);
+        sheet.addRow(headerColumns);
+        sheet.addRow(row);
+    }
+
     async export(name: string, products: Product[]): Promise<void> {
+        console.debug("products:" + products.map(p => p.title));
         // Create workbook
         const wb = new ExcelJS.Workbook();
 
-        // Get unique products
-        let prs: Product[] = [];
-        products.forEach(p => {
-            if (prs.some(pr => pr.equals(p))) return;
-            prs.push(p);
-        });
+        const sortedUniqueProducts: Product[] = _(products)
+            .uniqBy(product => product.id)
+            .sortBy(product => product.title)
+            .value();
 
-        // Sort products by title
-        prs.sort((a, b) => {
-            if (a.title < b.title) {
-                return -1;
-            }
-            if (a.title > b.title) {
-                return 1;
-            }
-            return 0;
-        });
+        console.debug("sortedUniqueProducts: " + sortedUniqueProducts.map(p => p.title));
+        const activeProducts = sortedUniqueProducts
+            .filter(product => product.status === "active")
+            .map(product => {
+                return [
+                    product.id,
+                    product.title,
+                    product.quantity.value,
+                    product.status,
+                ] as ProductRow;
+            });
+        console.debug("activeProducts:" + activeProducts.map(p => p));
+        this.createAndPopulateProductWorksheet(
+            wb,
+            "Active Products",
+            ["Id", "Title", "Quantity", "Status"],
+            activeProducts
+        );
 
-        // add worksheet for active products
-        const sh = wb.addWorksheet("Active Products");
+        const inactiveProducts = sortedUniqueProducts
+            .filter(product => product.status === "inactive")
+            .map(product => {
+                return [
+                    product.id,
+                    product.title,
+                    product.quantity.value,
+                    product.status,
+                ] as ProductRow;
+            });
+        console.debug("inactiveProducts:" + inactiveProducts.map(p => p));
+        this.createAndPopulateProductWorksheet(
+            wb,
+            "Inactive Products",
+            ["Id", "Title", "Quantity", "Status"],
+            inactiveProducts
+        );
 
-        // Add row header
-        sh.addRow(["Id", "Title", "Quantity", "Status"]);
+        const noOfProducts = sortedUniqueProducts.length ? sortedUniqueProducts.length : undefined;
+        const total = sortedUniqueProducts.reduce((aggregator, val) => {
+            return aggregator + val.quantity.value;
+        }, 0);
+        const activeTotal = activeProducts.reduce((aggregator, val) => {
+            return aggregator + val[2];
+        }, 0);
+        const inactiveTotal = inactiveProducts.reduce((aggregator, val) => {
+            return aggregator + val[2];
+        }, 0);
 
-        prs.forEach(p => {
-            if (p.status === "active") {
-                sh.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
+        const summaryRow = [
+            noOfProducts,
+            total ? total : undefined,
+            activeTotal ? activeTotal : undefined,
+            inactiveTotal ? inactiveTotal : undefined,
+        ];
 
-        // add worksheet for inactive products
-        const sh2 = wb.addWorksheet("Inactive Products");
-
-        // Add row header
-        sh2.addRow(["Id", "Title", "Quantity", "Status"]);
-
-        prs.forEach(p => {
-            if (p.status === "inactive") {
-                sh2.addRow([p.id, p.title, p.quantity.value, p.status]);
-            }
-        });
-
-        // Add sheet summary
-        const sh3 = wb.addWorksheet("Summary");
-
-        let total = 0;
-        let act = 0;
-        let inctv = 0;
-
-        prs.forEach(p => {
-            total += p.quantity.value;
-            if (p.status === "active") {
-                act += p.quantity.value;
-            }
-            if (p.status === "inactive") {
-                inctv += p.quantity.value;
-            }
-        });
-
-        sh3.addRow(["# Products", "# Items total", "# Items active", "# Items inactive"]);
-        sh3.addRow([
-            // If a value is zero, render an empty cell instead
-            prs.length > 0 ? prs.length : undefined,
-            total > 0 ? total : undefined,
-            act > 0 ? act : undefined,
-            inctv > 0 ? act : undefined,
-        ]);
+        console.debug("summaryRow: " + summaryRow);
+        this.createAndPopulateSummaryWorksheet(
+            wb,
+            "Summary",
+            ["# Products", "# Items total", "# Items active", "# Items inactive"],
+            summaryRow
+        );
 
         // Write xlsx file
         await wb.xlsx.writeFile(name);
