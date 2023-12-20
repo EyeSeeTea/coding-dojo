@@ -102,6 +102,11 @@ export class Future<E, D> {
         });
     }
 
+    static fromPromise<Error, D>(promise: Promise<D>): Future<Error, D> {
+        const cpromise = new rcpromise.CancellablePromise(promise, () => {});
+        return new Future<Error, D>(() => cpromise);
+    }
+
     static parallel<E, D>(asyncs: Future<E, D>[], options: ParallelOptions): Future<E, D[]> {
         return new Future(() =>
             rcpromise.buildCancellablePromise(async $ => {
