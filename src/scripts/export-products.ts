@@ -25,11 +25,11 @@ function main() {
                 short: "a",
                 description: "DHIS2 auth: USERNAME:PASSWORD",
             }),
-            fileName: option({
+            path: option({
                 type: string,
-                long: "fileName",
-                short: "n",
-                description: "Spreadsheet file name",
+                long: "path",
+                short: "p",
+                description: "Spreadsheet file path",
             }),
         },
         handler: async args => {
@@ -45,7 +45,9 @@ function main() {
             new ExportProductsToSpreadsheetUseCase(
                 productExportSpreadsheetRepository,
                 productRepository
-            ).execute(args.fileName);
+            )
+                .execute(args.path)
+                .run(() => console.debug(`Products exported to ${args.path}`), console.error);
         },
     });
 

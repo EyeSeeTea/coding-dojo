@@ -26,7 +26,7 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         this.generateSheetSummary(summarySheet, activeProducts, inactiveProducts);
 
         // Write xlsx file
-        return Future.fromPromise(wb.xlsx.writeFile(name));
+        return Future.fromPromise<Error, void>(wb.xlsx.writeFile(name));
     }
 
     private getValueOrEmpty(value: number): number | undefined {
@@ -43,10 +43,6 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
             .value();
     }
 
-    private addWorksheet(workbook: ExcelJS.Workbook, name: string): ExcelJS.Worksheet {
-        return workbook.addWorksheet(name);
-    }
-
     private getProductsByStatus(products: Product[], status: ProductStatus): Product[] {
         return _(products)
             .filter(product => product.status === status)
@@ -54,9 +50,10 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
     }
 
     private generateSheet(sheet: ExcelJS.Worksheet, products: Product[]) {
-        // Add row header
         sheet.addRow(["Id", "Title", "Quantity", "Status"]);
-        products.forEach(p => sheet.addRow([p.id, p.title, p.quantity.value, p.status]));
+        products.forEach(p =>
+            sheet.addRow([p.id, p.title, this.getValueOrEmpty(p.quantity.value), p.status])
+        );
     }
 
     private generateSheetSummary(
@@ -70,6 +67,11 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         const itemsTotal =
             activeProducts.reduce((acc, curr) => acc + curr.quantity.value, 0) +
             inactiveProducts.reduce((acc, curr) => acc + curr.quantity.value, 0);
-        sheet.addRow([productsNumber, itemsTotal, activeProducts.length, inactiveProducts.length]);
+        sheet.addRow([
+            this.getValueOrEmpty(productsNumber),
+            this.getValueOrEmpty(itemsTotal),
+            this.getValueOrEmpty(activeProducts.length),
+            this.getValueOrEmpty(inactiveProducts.length),
+        ]);
     }
 }
