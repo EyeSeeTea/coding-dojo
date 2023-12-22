@@ -32,7 +32,9 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
     }
 
     private getUniqueProducts(products: Product[]): Product[] {
-        return _(products).uniq().value();
+        return _(products)
+            .uniqWith((product1, product2) => product1.equals(product2))
+            .value();
     }
 
     private sortProducts(products: Product[]): Product[] {
