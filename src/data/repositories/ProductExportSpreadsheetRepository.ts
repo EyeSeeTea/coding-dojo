@@ -7,23 +7,24 @@ import { Future } from "../../domain/entities/generic/Future";
 
 export class ProductExportSpreadsheetRepository implements ProductExportRepository {
     export(name: string, products: Product[]): FutureData<void> {
-        const wb = new ExcelJS.Workbook();
+        const workbook = new ExcelJS.Workbook();
+
         const uniqueProducts = this.getUniqueProducts(products);
         const sortedProducts = this.sortProducts(uniqueProducts);
 
-        const activeProductsSheet = wb.addWorksheet("Active Products");
+        const activeProductsSheet = workbook.addWorksheet("Active Products");
         const activeProducts = this.getProductsByStatus(sortedProducts, "active");
         this.generateSheet(activeProductsSheet, activeProducts);
 
-        const inactiveProductsSheet = wb.addWorksheet("Inactive Products");
+        const inactiveProductsSheet = workbook.addWorksheet("Inactive Products");
         const inactiveProducts = this.getProductsByStatus(sortedProducts, "inactive");
         this.generateSheet(inactiveProductsSheet, inactiveProducts);
 
-        const summarySheet = wb.addWorksheet("Summary");
+        const summarySheet = workbook.addWorksheet("Summary");
 
         this.generateSheetSummary(summarySheet, activeProducts, inactiveProducts);
 
-        return Future.fromPromise<Error, void>(wb.xlsx.writeFile(name));
+        return Future.fromPromise<Error, void>(workbook.xlsx.writeFile(name));
     }
 
     private getValueOrEmpty(value: number): number | undefined {
@@ -64,6 +65,7 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         const itemsTotal =
             activeProducts.reduce((acc, curr) => acc + curr.quantity.value, 0) +
             inactiveProducts.reduce((acc, curr) => acc + curr.quantity.value, 0);
+
         sheet.addRow([
             this.getValueOrEmpty(productsNumber),
             this.getValueOrEmpty(itemsTotal),
