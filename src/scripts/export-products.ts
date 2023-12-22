@@ -47,7 +47,10 @@ function main() {
                 productRepository
             )
                 .execute(args.path)
-                .run(() => console.debug("Products exported"), console.error);
+                .run(
+                    () => console.debug("Products exported"),
+                    () => console.error("Error exporting products")
+                );
         },
     });
 
