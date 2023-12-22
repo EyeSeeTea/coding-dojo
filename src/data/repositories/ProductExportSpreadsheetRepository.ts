@@ -13,19 +13,16 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
 
         const activeProductsSheet = wb.addWorksheet("Active Products");
         const activeProducts = this.getProductsByStatus(sortedProducts, "active");
-
         this.generateSheet(activeProductsSheet, activeProducts);
 
         const inactiveProductsSheet = wb.addWorksheet("Inactive Products");
         const inactiveProducts = this.getProductsByStatus(sortedProducts, "inactive");
         this.generateSheet(inactiveProductsSheet, inactiveProducts);
 
-        // Add sheet summary
         const summarySheet = wb.addWorksheet("Summary");
 
         this.generateSheetSummary(summarySheet, activeProducts, inactiveProducts);
 
-        // Write xlsx file
         return Future.fromPromise<Error, void>(wb.xlsx.writeFile(name));
     }
 

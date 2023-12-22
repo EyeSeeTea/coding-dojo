@@ -9,7 +9,7 @@ export class ExportProductsToSpreadsheetUseCase {
         private productRepository: ProductRepository
     ) {}
 
-    execute(spreadSheetPath: string): FutureData<void> {
+    execute(filePath: string): FutureData<void> {
         return this.productRepository
             .getProducts(
                 {
@@ -23,7 +23,7 @@ export class ExportProductsToSpreadsheetUseCase {
                 }
             )
             .flatMap(response => {
-                return this.productExportRepository.export(spreadSheetPath, response.objects);
+                return this.productExportRepository.export(filePath, response.objects);
             });
     }
 }
