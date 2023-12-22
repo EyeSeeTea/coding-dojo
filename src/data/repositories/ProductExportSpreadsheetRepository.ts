@@ -27,8 +27,8 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
         return Future.fromPromise<Error, void>(workbook.xlsx.writeFile(name));
     }
 
-    private getValueOrEmpty(value: number): number | undefined {
-        return value || undefined;
+    private getNumberOrEmpty(number: number): number | undefined {
+        return number || undefined;
     }
 
     private getUniqueProducts(products: Product[]): Product[] {
@@ -52,7 +52,7 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
     private generateSheet(sheet: ExcelJS.Worksheet, products: Product[]) {
         sheet.addRow(["Id", "Title", "Quantity", "Status"]);
         products.forEach(p =>
-            sheet.addRow([p.id, p.title, this.getValueOrEmpty(p.quantity.value), p.status])
+            sheet.addRow([p.id, p.title, this.getNumberOrEmpty(p.quantity.value), p.status])
         );
     }
 
@@ -69,10 +69,10 @@ export class ProductExportSpreadsheetRepository implements ProductExportReposito
             inactiveProducts.reduce((acc, curr) => acc + curr.quantity.value, 0);
 
         sheet.addRow([
-            this.getValueOrEmpty(productsNumber),
-            this.getValueOrEmpty(itemsTotal),
-            this.getValueOrEmpty(activeProducts.length),
-            this.getValueOrEmpty(inactiveProducts.length),
+            this.getNumberOrEmpty(productsNumber),
+            this.getNumberOrEmpty(itemsTotal),
+            this.getNumberOrEmpty(activeProducts.length),
+            this.getNumberOrEmpty(inactiveProducts.length),
         ]);
     }
 }
