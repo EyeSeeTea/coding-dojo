@@ -1,3 +1,17 @@
+// 2. Create a type that represents the lending state of a book in a library.
+// Users may place holds on books when they are checked-out by other users.
+// type LibraryBookState = { status: “available" } | …???...
+
+export type LibraryBookStateADT =
+    | { status: "available" }
+    | { status: "checked-out"; onHold: boolean };
+
+// caso 1: libro en biblio => status = available
+// caso 2: libro prestado => status = checked-out, onHold = false
+// caso 3: libro prestado y reservado => status = checked-out, onHold = true
+
+// --------------------
+
 // 1. Create a fully-typed generic function namedToInitials that works like this:
 // namedToInitials({ id: 1, name: "Kristin Scott Thomas" })
 //             // returns { id: 1, initials: “KST" }
