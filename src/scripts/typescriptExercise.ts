@@ -11,7 +11,7 @@ function namedToInitials<T extends string | number>(
 
     const initials: string = (namedObj.name as string)
         .split(" ")
-        .map((word: string) => word.charAt(0).toUpperCase())
+        .map((name: string) => name.charAt(0).toUpperCase())
         .join("");
 
     delete namedObj.name;
