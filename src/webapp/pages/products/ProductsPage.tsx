@@ -1,19 +1,17 @@
 import {
-    ConfirmationDialog,
     ObjectsList,
     TableConfig,
     useObjectsTable,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 
-import React, { ChangeEvent, useCallback, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import i18n from "../../../utils/i18n";
 import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
 import { Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { useProducts } from "./useProducts";
 import { Product, ProductStatus } from "../../../domain/entities/Product";
-import { Edit } from "@material-ui/icons";
 import { EditQuantityProductDialog } from "./EditQuantityProductDialog";
 
 export const ProductsPage: React.FC = React.memo(() => {
