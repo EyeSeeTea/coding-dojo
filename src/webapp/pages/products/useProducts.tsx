@@ -87,7 +87,7 @@ export function useProducts(): ProductsState {
         [currentProduct]
     );
 
-    const saveEditQuantity = useCallback(async () => {
+    const saveEditQuantity = useCallback(() => {
         const api = compositionRoot.api.get;
 
         if (currentProduct && api) {
