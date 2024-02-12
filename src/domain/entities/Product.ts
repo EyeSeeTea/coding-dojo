@@ -11,6 +11,7 @@ interface ProductData extends EntityData {
     image: string;
     quantity: Quantity;
     status: ProductStatus;
+    lastUpdated: Date;
 }
 
 export type ProductStatus = "active" | "inactive";
@@ -20,6 +21,7 @@ export class Product extends Entity {
     public readonly image: string;
     public readonly quantity: Quantity;
     public readonly status: ProductStatus;
+    public readonly lastUpdated: Date;
 
     constructor(data: ProductData) {
         super(data.id);
@@ -28,26 +30,35 @@ export class Product extends Entity {
         this.image = data.image;
         this.quantity = data.quantity;
         this.status = data.status;
+        this.lastUpdated = data.lastUpdated;
     }
 
     public updateQuantity(quantity: string): Either<ValidationError<Product>[], Product> {
-        return Product.validateAndCreate(this.id, this.title, this.image, quantity);
+        return Product.validateAndCreate(
+            this.id,
+            this.title,
+            this.image,
+            quantity,
+            this.lastUpdated
+        );
     }
 
     public static create(
         id: string,
         title: string,
         image: string,
-        quantity: string
+        quantity: string,
+        lastUpdated: Date
     ): Either<ValidationError<Product>[], Product> {
-        return this.validateAndCreate(id, title, image, quantity);
+        return this.validateAndCreate(id, title, image, quantity, lastUpdated);
     }
 
     private static validateAndCreate(
         id: string,
         title: string,
         image: string,
-        quantity: string
+        quantity: string,
+        lastUpdated: Date
     ): Either<ValidationError<Product>[], Product> {
         const quantityValidation = Quantity.create(quantity);
 
@@ -66,6 +77,7 @@ export class Product extends Entity {
                     image,
                     quantity: quantityValidation.get(),
                     status: +quantity === 0 ? "inactive" : "active",
+                    lastUpdated,
                 })
             );
         } else {

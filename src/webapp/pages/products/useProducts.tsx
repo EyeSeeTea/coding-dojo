@@ -49,6 +49,7 @@ export function useProducts(): ProductsState {
                             id,
                             title: product.title,
                             quantity: product.quantity.value.toString(),
+                            lastUpdated: product.lastUpdated,
                         });
                     },
                     error => {

@@ -13,6 +13,7 @@ import { TextField, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { useProducts } from "./useProducts";
 import { Product, ProductStatus } from "../../../domain/entities/Product";
+import moment from "moment";
 
 export const ProductsPage: React.FC = React.memo(() => {
     const snackbar = useSnackbar();
@@ -102,6 +103,16 @@ export const ProductsPage: React.FC = React.memo(() => {
         [onChangeQuantity]
     );
 
+    const lastUpdatedCurrentProduct = useMemo(
+        () =>
+            currentProduct
+                ? `${i18n.t("Last updated")}: ${moment(currentProduct.lastUpdated).format(
+                      "yyyy-MM-DD HH:mm"
+                  )}`
+                : undefined,
+        [currentProduct]
+    );
+
     return (
         <Container>
             <Typography variant="h4">{i18n.t("Products")}</Typography>
@@ -124,6 +135,10 @@ export const ProductsPage: React.FC = React.memo(() => {
                     fullWidth
                     disableSave={currentProduct.error !== undefined}
                 >
+                    <Typography style={{ marginBottom: 10 }}>
+                        {lastUpdatedCurrentProduct}
+                    </Typography>
+
                     <TextField
                         label={i18n.t("Quantity")}
                         value={currentProduct.quantity}

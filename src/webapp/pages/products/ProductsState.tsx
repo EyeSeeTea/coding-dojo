@@ -25,6 +25,7 @@ export interface CurrentProduct {
     title: string;
     quantity: string;
     error?: string;
+    lastUpdated: Date;
 }
 
 export interface GlobalMessage {
