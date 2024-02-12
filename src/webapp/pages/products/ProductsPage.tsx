@@ -6,7 +6,7 @@ import {
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 
-import React, { ChangeEvent, useEffect, useMemo } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useMemo } from "react";
 import i18n from "../../../utils/i18n";
 import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
 import { TextField, Typography } from "@material-ui/core";
@@ -96,11 +96,11 @@ export const ProductsPage: React.FC = React.memo(() => {
 
     const tableProps = useObjectsTable(baseConfig, getProducts);
 
-    function handleChangeQuantity(
-        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ): void {
-        onChangeQuantity(event.target.value);
-    }
+    const handleChangeQuantity = useCallback(
+        (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+            onChangeQuantity(event.target.value),
+        [onChangeQuantity]
+    );
 
     return (
         <Container>
