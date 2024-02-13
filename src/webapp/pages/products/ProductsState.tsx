@@ -17,7 +17,7 @@ export interface ProductsState {
     updateProductQuantity: (id: string) => Promise<void>;
     cancelEditQuantity: () => void;
     onChangeQuantity: (quantity: string) => void;
-    saveEditQuantity: () => Promise<void>;
+    saveEditQuantity: () => void;
 }
 
 export interface CurrentProduct {
@@ -25,6 +25,7 @@ export interface CurrentProduct {
     title: string;
     quantity: string;
     error?: string;
+    lastUpdated: Date;
 }
 
 export interface GlobalMessage {

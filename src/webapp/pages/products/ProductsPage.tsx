@@ -1,18 +1,18 @@
 import {
-    ConfirmationDialog,
     ObjectsList,
     TableConfig,
     useObjectsTable,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 
-import React, { ChangeEvent, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import i18n from "../../../utils/i18n";
 import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
-import { TextField, Typography } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { useProducts } from "./useProducts";
 import { Product, ProductStatus } from "../../../domain/entities/Product";
+import { EditQuantityProductDialog } from "./EditQuantityProductDialog";
 
 export const ProductsPage: React.FC = React.memo(() => {
     const snackbar = useSnackbar();
@@ -96,12 +96,6 @@ export const ProductsPage: React.FC = React.memo(() => {
 
     const tableProps = useObjectsTable(baseConfig, getProducts);
 
-    function handleChangeQuantity(
-        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ): void {
-        onChangeQuantity(event.target.value);
-    }
-
     return (
         <Container>
             <Typography variant="h4">{i18n.t("Products")}</Typography>
@@ -111,27 +105,14 @@ export const ProductsPage: React.FC = React.memo(() => {
                 columns={tableProps.columns}
                 onChangeSearch={undefined}
             />
+
             {currentProduct !== undefined && (
-                <ConfirmationDialog
-                    isOpen={true}
-                    title={i18n.t("Update Quantity")}
-                    onCancel={cancelEditQuantity}
-                    cancelText={i18n.t("Cancel")}
-                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onSave={saveEditQuantity}
-                    saveText={i18n.t("Save")}
-                    maxWidth="xs"
-                    fullWidth
-                    disableSave={currentProduct.error !== undefined}
-                >
-                    <TextField
-                        label={i18n.t("Quantity")}
-                        value={currentProduct.quantity}
-                        onChange={handleChangeQuantity}
-                        error={currentProduct.error !== undefined}
-                        helperText={currentProduct.error}
-                    />
-                </ConfirmationDialog>
+                <EditQuantityProductDialog
+                    currentProduct={currentProduct}
+                    cancelEditQuantity={cancelEditQuantity}
+                    saveEditQuantity={saveEditQuantity}
+                    onChangeQuantity={onChangeQuantity}
+                />
             )}
         </Container>
     );

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-03T14:20:46.033Z\n"
-"PO-Revision-Date: 2023-11-03T14:20:46.033Z\n"
+"POT-Creation-Date: 2024-02-12T12:04:13.268Z\n"
+"PO-Revision-Date: 2024-02-12T12:04:13.268Z\n"
 
 msgid "Add"
 msgstr ""
@@ -26,26 +26,29 @@ msgstr ""
 msgid "Detail page"
 msgstr ""
 
-msgid "Title"
-msgstr ""
-
-msgid "Image"
-msgstr ""
-
-msgid "Quantity"
-msgstr ""
-
-msgid "Status"
+msgid "Last updated"
 msgstr ""
 
 msgid "Update Quantity"
-msgstr ""
-
-msgid "Products"
 msgstr ""
 
 msgid "Cancel"
 msgstr ""
 
 msgid "Save"
+msgstr ""
+
+msgid "Quantity"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Image"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Products"
 msgstr ""
