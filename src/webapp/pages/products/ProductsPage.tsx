@@ -13,6 +13,7 @@ import { TextField, Typography } from "@material-ui/core";
 import styled from "styled-components";
 import { useProducts } from "./useProducts";
 import { Product, ProductStatus } from "../../../domain/entities/Product";
+import { CurrentProduct } from "./ProductsState";
 
 export const ProductsPage: React.FC = React.memo(() => {
     const snackbar = useSnackbar();
@@ -96,13 +97,6 @@ export const ProductsPage: React.FC = React.memo(() => {
 
     const tableProps = useObjectsTable(baseConfig, getProducts);
 
-    const handleChangeQuantity = React.useCallback(
-        (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            onChangeQuantity(event.target.value);
-        },
-        [onChangeQuantity]
-    );
-
     const currentProductLastUpdated = React.useMemo(
         () => currentProduct && currentProduct.lastUpdated.toLocaleString(),
         [currentProduct]
@@ -118,32 +112,67 @@ export const ProductsPage: React.FC = React.memo(() => {
                 onChangeSearch={undefined}
             />
             {currentProduct !== undefined && (
-                <ConfirmationDialog
-                    isOpen={true}
-                    title={i18n.t("Update Quantity")}
-                    onCancel={cancelEditQuantity}
-                    cancelText={i18n.t("Cancel")}
-                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onSave={saveEditQuantity}
-                    saveText={i18n.t("Save")}
-                    maxWidth="xs"
-                    fullWidth
-                    disableSave={currentProduct.error !== undefined}
-                >
-                    <Typography variant="h6">
-                        {i18n.t("Last updated: ")}
-                        {currentProductLastUpdated}
-                    </Typography>
-                    <TextField
-                        label={i18n.t("Quantity")}
-                        value={currentProduct.quantity}
-                        onChange={handleChangeQuantity}
-                        error={currentProduct.error !== undefined}
-                        helperText={currentProduct.error}
-                    />
-                </ConfirmationDialog>
+                <EditQuantityProductDialog
+                    cancelEditQuantity={cancelEditQuantity}
+                    saveEditQuantity={saveEditQuantity}
+                    currentProduct={currentProduct}
+                    currentProductLastUpdated={currentProductLastUpdated}
+                    onChangeQuantity={onChangeQuantity}
+                />
             )}
         </Container>
+    );
+});
+
+interface EditQuantityProductDialogProps {
+    onChangeQuantity: (quantity: string) => void;
+    cancelEditQuantity: () => void;
+    saveEditQuantity: () => Promise<void>;
+    currentProduct: CurrentProduct;
+    currentProductLastUpdated: string | undefined;
+}
+
+const EditQuantityProductDialog: React.FC<EditQuantityProductDialogProps> = React.memo(props => {
+    const {
+        cancelEditQuantity,
+        saveEditQuantity,
+        currentProduct,
+        currentProductLastUpdated,
+        onChangeQuantity,
+    } = props;
+
+    const handleChangeQuantity = React.useCallback(
+        (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            onChangeQuantity(event.target.value);
+        },
+        [onChangeQuantity]
+    );
+
+    return (
+        <ConfirmationDialog
+            isOpen={true}
+            title={i18n.t("Update Quantity")}
+            onCancel={cancelEditQuantity}
+            cancelText={i18n.t("Cancel")}
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onSave={saveEditQuantity}
+            saveText={i18n.t("Save")}
+            maxWidth="xs"
+            fullWidth
+            disableSave={currentProduct.error !== undefined}
+        >
+            <Typography variant="h6">
+                {i18n.t("Last updated: ")}
+                {currentProductLastUpdated}
+            </Typography>
+            <TextField
+                label={i18n.t("Quantity")}
+                value={currentProduct.quantity}
+                onChange={handleChangeQuantity}
+                error={currentProduct.error !== undefined}
+                helperText={currentProduct.error}
+            />
+        </ConfirmationDialog>
     );
 });
 
