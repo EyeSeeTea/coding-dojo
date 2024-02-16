@@ -97,7 +97,13 @@ export class ProductD2Repository implements ProductRepository {
         const quantity =
             event.dataValues.find(dv => dv.dataElement === dataElements.quantity)?.value || "0";
 
-        return Product.create(id, title, image, quantity.toString()).get();
+        return Product.create(
+            id,
+            title,
+            image,
+            quantity.toString(),
+            new Date(event.lastUpdated)
+        ).get();
     }
 }
 
@@ -118,6 +124,7 @@ const eventsFields = {
     eventDate: true,
     programStage: true,
     dataValues: { dataElement: true, value: true },
+    lastUpdated: true,
 } as const;
 
 export interface Event {
@@ -126,6 +133,7 @@ export interface Event {
     program: string;
     status: EventStatus;
     eventDate: string;
+    lastUpdated: string;
     attributeOptionCombo?: string;
     trackedEntityInstance?: string;
     programStage?: string;

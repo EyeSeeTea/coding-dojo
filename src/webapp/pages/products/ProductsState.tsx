@@ -24,6 +24,7 @@ export interface CurrentProduct {
     id: string;
     title: string;
     quantity: string;
+    lastUpdated: Date;
     error?: string;
 }
 

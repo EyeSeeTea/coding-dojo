@@ -103,6 +103,11 @@ export const ProductsPage: React.FC = React.memo(() => {
         [onChangeQuantity]
     );
 
+    const currentProductLastUpdated = React.useMemo(
+        () => currentProduct && currentProduct.lastUpdated.toLocaleString(),
+        [currentProduct]
+    );
+
     return (
         <Container>
             <Typography variant="h4">{i18n.t("Products")}</Typography>
@@ -125,6 +130,10 @@ export const ProductsPage: React.FC = React.memo(() => {
                     fullWidth
                     disableSave={currentProduct.error !== undefined}
                 >
+                    <Typography variant="h6">
+                        {i18n.t("Last updated: ")}
+                        {currentProductLastUpdated}
+                    </Typography>
                     <TextField
                         label={i18n.t("Quantity")}
                         value={currentProduct.quantity}
