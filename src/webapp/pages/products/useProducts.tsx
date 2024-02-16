@@ -6,6 +6,7 @@ import { useAppContext } from "../../contexts/app-context";
 import { useReload } from "../../hooks/use-reload";
 import { useCallback, useMemo, useState } from "react";
 import { CurrentProduct, GlobalMessage, ProductsState } from "./ProductsState";
+import React from "react";
 
 const pagination = {
     pageSizeOptions: [10, 20, 50],
@@ -60,32 +61,35 @@ export function useProducts(): ProductsState {
         [compositionRoot.products.getById, currentUser]
     );
 
-    function cancelEditQuantity(): void {
+    const cancelEditQuantity = React.useCallback(() => {
         setCurrentProduct(undefined);
-    }
+    }, []);
 
-    function onChangeQuantity(quantity: string): void {
-        if (!currentProduct) return;
+    const onChangeQuantity = React.useCallback(
+        (quantity: string) => {
+            if (!currentProduct) return;
 
-        Quantity.create(quantity).match({
-            error: errors => {
-                setCurrentProduct({
-                    ...currentProduct,
-                    quantity: quantity,
-                    error: errors.map(error => validationErrorMessages[error]()).join("\n"),
-                });
-            },
-            success: quantity => {
-                setCurrentProduct({
-                    ...currentProduct,
-                    quantity: quantity.value.toString(),
-                    error: undefined,
-                });
-            },
-        });
-    }
+            Quantity.create(quantity).match({
+                error: errors => {
+                    setCurrentProduct({
+                        ...currentProduct,
+                        quantity: quantity,
+                        error: errors.map(error => validationErrorMessages[error]()).join("\n"),
+                    });
+                },
+                success: quantity => {
+                    setCurrentProduct({
+                        ...currentProduct,
+                        quantity: quantity.value.toString(),
+                        error: undefined,
+                    });
+                },
+            });
+        },
+        [currentProduct]
+    );
 
-    async function saveEditQuantity(): Promise<void> {
+    const saveEditQuantity = React.useCallback(async () => {
         const api = compositionRoot.api.get;
 
         if (currentProduct && api) {
@@ -108,7 +112,13 @@ export function useProducts(): ProductsState {
                     }
                 );
         }
-    }
+    }, [
+        compositionRoot.api.get,
+        compositionRoot.products.update,
+        currentProduct,
+        currentUser,
+        reload,
+    ]);
 
     return {
         getProducts,

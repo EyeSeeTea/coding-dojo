@@ -96,11 +96,12 @@ export const ProductsPage: React.FC = React.memo(() => {
 
     const tableProps = useObjectsTable(baseConfig, getProducts);
 
-    function handleChangeQuantity(
-        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ): void {
-        onChangeQuantity(event.target.value);
-    }
+    const handleChangeQuantity = React.useCallback(
+        (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            onChangeQuantity(event.target.value);
+        },
+        [onChangeQuantity]
+    );
 
     return (
         <Container>
