@@ -1,4 +1,4 @@
-import { EventStatus } from "@eyeseetea/d2-api";
+import { EventStatus, Id } from "@eyeseetea/d2-api";
 import { Product } from "../../domain/entities/Product";
 import {
     PaginatedReponse,
@@ -99,7 +99,37 @@ export class ProductD2Repository implements ProductRepository {
 
         return Product.create(id, title, image, quantity.toString()).get();
     }
+
+    private async getMetaData(): Promise<Section[]> {
+        const data = await this.api.models.dataElements
+            .get({ fields: { id: true, code: true } })
+            .getData();
+
+        const sections = data.objects.map((dataElement): Section => {
+            const code = dataElement.code;
+            const validCodes = ["warning", "error"] as const;
+            // if ((validCodes as string[]).includes(code)) {
+            if (code === "warning" || code === "error") {
+                return {
+                    id: dataElement.id,
+                    status: code,
+                };
+            } else {
+                throw Error("");
+            }
+        });
+
+        if (sections[0]?.status === "warning") {
+        } else if (sections[0]?.status === "error") {
+        } else {
+            throw Error("");
+        }
+
+        return sections;
+    }
 }
+
+type Section = { id: Id; status: "warning" | "error" };
 
 const program = "x7s8Yurmj7Q";
 
@@ -139,3 +169,10 @@ export interface DataValue {
     dataElement: string;
     value: string | number | boolean;
 }
+
+type User = unknown;
+type LibraryBookState =
+    | { status: "available" }
+    | { status: "checkout"; byUser: User; dueDate: Date; holds: User[] }
+    | { status: "onhold"; forUser: User; untilDate: Date; otherHolds: User[] }
+    | { status: "lost" };

@@ -1,5 +1,4 @@
 import { FutureData } from "../../data/api-futures";
-import { Product } from "../entities/Product";
 import { Id } from "../entities/Ref";
 import { User } from "../entities/User";
 import { validationErrorMessages } from "../entities/generic/Errors";
