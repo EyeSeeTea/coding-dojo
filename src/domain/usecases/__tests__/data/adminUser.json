@@ -1,0 +1,13 @@
+{
+    "id": "xE7jOejl9FI",
+    "name": "John Traore",
+    "userGroups": [],
+    "username": "admin",
+    "userRoles": [
+        {
+            "name": "Superuser",
+            "id": "Ufph3mGRmMo",
+            "authorities": ["ALL"]
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "id": "SCV2BjgSmFY",
+    "name": "Non Admin",
+    "userGroups": [],
+    "username": "nonadmin",
+    "userRoles": [{ "name": "Antenatal care program", "id": "UYXOT4A7JMI", "authorities": [] }]
+}

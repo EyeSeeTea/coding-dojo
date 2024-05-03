@@ -4,7 +4,7 @@ import { Future } from "../entities/generic/Future";
 import { DataElementRepository } from "../repositories/DataElementRepository";
 import { UserRepository } from "../repositories/UserRepository";
 
-export class GetDataElements {
+export class GetDataElementsUseCase {
     constructor(
         private dataElementRepository: DataElementRepository,
         private userRepository: UserRepository
@@ -15,8 +15,10 @@ export class GetDataElements {
             if (user.isAdmin()) {
                 return this.dataElementRepository.get();
             } else {
-                return Future.error(new Error("User is not an admin"));
+                return Future.error(new NonAdminUserError("User is not an admin"));
             }
         });
     }
 }
+
+export class NonAdminUserError extends Error {}
