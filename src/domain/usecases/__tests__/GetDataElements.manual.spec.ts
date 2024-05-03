@@ -8,8 +8,7 @@ import nonAdminUser from "./data/nonAdminUser.json";
 import adminUser from "./data/adminUser.json";
 import { User } from "../../entities/User";
 import { GetDataElementsUseCase, NonAdminUserError } from "../GetDataElementsUseCase";
-import { assertType, expectTypeOf } from "vitest";
-import { error } from "console";
+import { expectTypeOf } from "vitest";
 
 describe("GetCurrentUserUseCase", () => {
     it("returns data elements if user is admin", async () => {
