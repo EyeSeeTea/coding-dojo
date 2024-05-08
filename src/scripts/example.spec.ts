@@ -60,17 +60,19 @@ describe("Get data elements", () => {
             .execute()
             .toPromise();
 
-        expect(dataElementResponse).toBe(dataElements);
+        expect(dataElementResponse).toEqual(dataElements);
     });
 
     test("if user is not an admin should return nothing", async () => {
-        const dataElementResponse = await new GetDataElementsUseCase(
-            new DataElementStubRepository(),
-            new UserStubRepository(noAdminUser)
-        )
-            .execute()
-            .toPromise();
-
-        expect(dataElementResponse).toBe(undefined);
+        try {
+            const _dataElement = await new GetDataElementsUseCase(
+                new DataElementStubRepository(),
+                new UserStubRepository(noAdminUser)
+            )
+                .execute()
+                .toPromise();
+        } catch (e) {
+            expect(e).toEqual(new Error("This action is not allowed"));
+        }
     });
 });

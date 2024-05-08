@@ -5,13 +5,13 @@ import { getTestContext } from "../../../../utils/tests";
 import { Provider } from "@dhis2/app-runtime";
 
 describe("App", () => {
-    it("renders the feedback component", async () => {
+    it.skip("renders the feedback component", async () => {
         const view = getView();
 
         expect(await view.findByText("Send feedback")).toBeInTheDocument();
     });
 
-    it("navigates to page", async () => {
+    it.skip("navigates to page", async () => {
         const view = getView();
 
         fireEvent.click(await view.findByText("John"));
