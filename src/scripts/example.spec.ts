@@ -63,7 +63,7 @@ describe("Get data elements", () => {
         expect(dataElementResponse).toEqual(dataElements);
     });
 
-    test("if user is not an admin should return nothing", async () => {
+    test("if user is not an admin should return an error", async () => {
         try {
             const _dataElement = await new GetDataElementsUseCase(
                 new DataElementStubRepository(),
