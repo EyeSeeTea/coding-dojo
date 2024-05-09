@@ -1,9 +1,9 @@
 import { D2Api } from "../../types/d2-api";
 import { apiToFuture, FutureData } from "../api-futures";
 import { DataElement } from "../../domain/entities/DataElement";
-import { DataElementsRepository } from "../../domain/repositories/DataElementsRepository";
+import { DataElementRepository } from "../../domain/repositories/DataElementRepository";
 
-export class DataElementsD2Repository implements DataElementsRepository {
+export class DataElementsD2Repository implements DataElementRepository {
     constructor(private api: D2Api) {}
 
     public getAll(): FutureData<DataElement[]> {

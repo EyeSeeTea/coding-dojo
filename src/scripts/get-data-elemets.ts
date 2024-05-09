@@ -11,11 +11,11 @@ import { exit } from "process";
 
 export async function getDataElements(api: D2Api) {
     const usersRepository = new UserD2Repository(api);
-    const DataElementsRepository = new DataElementsD2Repository(api);
+    const dataElementRepository = new DataElementsD2Repository(api);
 
     const getAllDataElementsUseCase = new GetAllDataElementsUseCase(
         usersRepository,
-        DataElementsRepository
+        dataElementRepository
     );
 
     try {
