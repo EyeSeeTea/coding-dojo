@@ -34,6 +34,7 @@
         "real-cancellable-promise": "^1.1.2",
         "styled-components": "5.3.5",
         "styled-jsx": "3.4.5",
+        "ts-mockito": "^2.6.1",
         "typed-immutable-map": "^0.1.1",
         "zustand": "^4.3.7"
     },
@@ -105,7 +106,8 @@
         "localize": "yarn update-po && d2-i18n-generate -n dhis2-skeleton-app -p ./i18n/ -o ./src/locales/",
         "update-po": "yarn extract-pot && find i18n/ -name '*.po' -exec msgmerge --backup=off -U {} i18n/en.pot \\;",
         "prepare": "husky install",
-        "script-example": "npx ts-node src/scripts/example.ts"
+        "script-example": "npx ts-node src/scripts/example.ts",
+        "test-double": "npx ts-node src/scripts/get-data-elements.ts -u 'https://dev.eyeseetea.com/play' -a 'admin:district'"
     },
     "manifest.webapp": {
         "name": "DHIS2 Skeleton App",
