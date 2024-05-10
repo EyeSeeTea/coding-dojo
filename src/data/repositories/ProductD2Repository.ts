@@ -99,37 +99,7 @@ export class ProductD2Repository implements ProductRepository {
 
         return Product.create(id, title, image, quantity.toString()).get();
     }
-
-    private async getMetaData(): Promise<Section[]> {
-        const data = await this.api.models.dataElements
-            .get({ fields: { id: true, code: true } })
-            .getData();
-
-        const sections = data.objects.map((dataElement): Section => {
-            const code = dataElement.code;
-            const validCodes = ["warning", "error"] as const;
-            // if ((validCodes as string[]).includes(code)) {
-            if (code === "warning" || code === "error") {
-                return {
-                    id: dataElement.id,
-                    status: code,
-                };
-            } else {
-                throw Error("");
-            }
-        });
-
-        if (sections[0]?.status === "warning") {
-        } else if (sections[0]?.status === "error") {
-        } else {
-            throw Error("");
-        }
-
-        return sections;
-    }
 }
-
-type Section = { id: Id; status: "warning" | "error" };
 
 const program = "x7s8Yurmj7Q";
 
