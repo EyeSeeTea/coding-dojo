@@ -109,6 +109,18 @@ describe("Collection", () => {
         expectTypeOf(valueDefault).toEqualTypeOf<number>();
     });
 
+    test("findIndex", () => {
+        const values = _(["a", "b", "c"]);
+
+        const valueFound = values.findIndex("b");
+        expect(valueFound).toEqual(1);
+        expectTypeOf(valueFound).toEqualTypeOf<number | undefined>();
+
+        const valueNotFound = values.findIndex("d");
+        expect(valueNotFound).toEqual(undefined);
+        expectTypeOf(valueNotFound).toEqualTypeOf<number | undefined>();
+    });
+
     test("splitAt", () => {
         const values = _([0, 1, 2, 3, 4, 5]);
 

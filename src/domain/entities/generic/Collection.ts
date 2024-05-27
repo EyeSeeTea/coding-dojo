@@ -108,6 +108,11 @@ export class Collection<T> {
         return this.xs.find(pred) || (options?.or as Or);
     }
 
+    findIndex(x: T): number | undefined {
+        const index = this.xs.findIndex(v => v === x);
+        return index !== -1 ? index : undefined;
+    }
+
     sort(): Collection<T> {
         return this.sortWith(defaultCompareFn);
     }
