@@ -104,6 +104,15 @@ export class Collection<T> {
 
     any = this.some;
 
+    // Kata 2: Extend generic/Collection.ts so we can do this:
+    // _([“a”, “b”, “c”]).indexOf(“b”); // 1
+    // _([“a”, “b”, “c”]).indexOf(“d”); // undefined
+
+    indexOf(x: T): number | undefined {
+        const index = this.xs.indexOf(x);
+        return index === -1 ? undefined : index;
+    }
+
     find<Or extends T | undefined>(pred: (x: T) => boolean, options: { or?: Or } = {}): T | Or {
         return this.xs.find(pred) || (options?.or as Or);
     }
