@@ -93,6 +93,13 @@ describe("Collection", () => {
         expect(values.any(x => x > 3)).toEqual(false);
     });
 
+    test("indexOf", () => {
+        const values = _(["a", "b", "c"]);
+
+        expect(values.indexOf("b")).toEqual(1);
+        expect(values.indexOf("d")).toEqual(undefined);
+    });
+
     test("find", () => {
         const values = _([1, 2, 3]);
 
