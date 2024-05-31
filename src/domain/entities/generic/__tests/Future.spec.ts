@@ -69,6 +69,13 @@ describe("helpers", () => {
 });
 
 describe("Transformations", () => {
+    test("isomap", async () => {
+        const value1$ = Future.success(1);
+        const value2$ = value1$.isomap((x: number) => x + 1);
+
+        await expectAsync(value2$, { toEqual: 2 });
+    });
+
     test("map", async () => {
         const value1$ = Future.success(1);
         const value2$ = value1$.map(x => x.toString());

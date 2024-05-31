@@ -10,6 +10,7 @@ import { Cancellation } from "real-cancellable-promise";
  *
  * More info: https://github.com/EyeSeeTea/know-how/wiki/Async-futures
  */
+
 export class Future<E, D> {
     private constructor(private _promise: () => rcpromise.CancellablePromise<D>) {}
 
@@ -43,6 +44,10 @@ export class Future<E, D> {
                 onError(err);
             }
         }).cancel;
+    }
+
+    isomap(fn: (data: D) => D): Future<E, D> {
+        return new Future(() => this._promise().then(fn));
     }
 
     map<U>(fn: (data: D) => U): Future<E, U> {
