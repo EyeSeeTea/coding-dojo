@@ -46,6 +46,10 @@ export class Collection<T> {
         return this.xs.length;
     }
 
+    indexOf(value: T): number | undefined {
+        const index = this.xs.indexOf(value);
+        return index === -1 ? undefined : index;
+    }
     /* Methods that return a Collection */
 
     map<U>(fn: (x: T) => U): Collection<U> {
