@@ -333,4 +333,20 @@ describe("Collection", () => {
         expect(hashMap.get(2)).toEqual("1");
         expect(hashMap.get(4)).toEqual("2");
     });
+
+    test("toHashMap from pairs", () => {
+        const hashMap = _([1, 2]).toHashMap(x => [2 * x, x.toString()]);
+
+        expect(hashMap.size).toEqual(2);
+        expect(hashMap.get(2)).toEqual("1");
+        expect(hashMap.get(4)).toEqual("2");
+    });
+
+    test("indexOf", () => {
+        const indexOf1 = _(["a", "ab", "x", "xy"]).indexOf("a");
+        const indexOf2 = _([1, 2, 3, 4]).indexOf(4);
+
+        expect(indexOf1).toEqual(0);
+        expect(indexOf2).toEqual(3);
+    });
 });

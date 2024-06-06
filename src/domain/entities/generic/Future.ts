@@ -68,6 +68,9 @@ export class Future<E, D> {
     toPromise(): Promise<D> {
         return this._promise();
     }
+    isomap(fn: (data: D) => D): Future<E, D> {
+        return new Future(() => this._promise().then(fn));
+    }
 
     static join2<E, T, S>(async1: Future<E, T>, async2: Future<E, S>): Future<E, [T, S]> {
         return new Future(() => {

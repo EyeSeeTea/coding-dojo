@@ -299,6 +299,10 @@ export class Collection<T> {
         const pairs = this.map(toPairFn).toArray();
         return HashMap.fromPairs(pairs);
     }
+
+    indexOf(b: T): number {
+        return this.xs.indexOf(b);
+    }
 }
 
 type CompareRes = -1 | 0 | 1;
