@@ -76,6 +76,32 @@ describe("Transformations", () => {
         await expectAsync(value2$, { toEqual: "1" });
     });
 
+    test("isomap", async () => {
+        const n1$ = Future.success(1);
+        const n2$ = n1$.isomap(n => n + 1);
+        await expectAsync(n2$, { toEqual: 2 });
+        expectTypeOf(n2$).toEqualTypeOf<Future<unknown, number>>();
+    });
+
+    test("isomaperror", async () => {
+        const value1$ = Future.success(1);
+        const n2$ = value1$.isomapexperimental(x => x.toString());
+
+        await expectAsync(n2$, { toThrow: new Error("Type mismatch in isomap") });
+
+        expectTypeOf(n2$).toEqualTypeOf<Future<unknown, number>>();
+    });
+
+    test("isomaperror3", async () => {
+        const value1$ = Future.success(1);
+        const error$ = Future.error("isomapexperimental: type mismatch");
+        const n2$ = value1$.isomapexperimental3(x => x.toString());
+
+        await expectAsync(n2$, { toThrow: error$ });
+
+        expectTypeOf(error$).toEqualTypeOf<Future<string, unknown>>();
+    });
+
     test("mapError", async () => {
         const value1$ = Future.error(1);
         const value2$ = value1$.mapError(x => x.toString());

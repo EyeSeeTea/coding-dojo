@@ -45,6 +45,47 @@ export class Future<E, D> {
         }).cancel;
     }
 
+    isomap(fn: (data: D) => D): Future<E, D> {
+        return new Future(() => this._promise().then(fn));
+    }
+
+    isomapexperimental(fn: (data: D) => D): Future<E, D> {
+        return new Future(() =>
+            this._promise().then(data => {
+                const result = fn(data);
+                if (typeof result !== typeof data) {
+                    Future.error(new Error("isomapexperimental: type mismatch"));
+                }
+                return result;
+            })
+        );
+    }
+
+    isomapexperimental3(fn: (data: D) => D): Future<E, D> {
+        return new Future(() =>
+            this._promise()
+                .then(data => {
+                    const result = fn(data);
+                    if (typeof result !== typeof data) {
+                        throw new Error("isomapexperimental: type mismatch");
+                    }
+                    return result;
+                })
+                .catch((error: E) => {
+                    throw error;
+                })
+        );
+    }
+    isomapexperimental2(fn: (data: D) => D): Future<E, D> {
+        return Future.success(data => {
+            const result = fn(data);
+            if (typeof result !== typeof data) {
+                return Future.error(new Error("isomapexperimental: type mismatch"));
+            }
+            return Future.success(result);
+        });
+    }
+
     map<U>(fn: (data: D) => U): Future<E, U> {
         return new Future(() => this._promise().then(fn));
     }
