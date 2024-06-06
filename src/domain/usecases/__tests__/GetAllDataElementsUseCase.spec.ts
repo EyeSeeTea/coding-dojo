@@ -7,14 +7,13 @@ describe("test GetDataElements", () => {
         const dataElements = await compositionRoot.dataElements.getAll.execute().toPromise();
 
         expect(dataElements).toBeDefined();
+        expect(dataElements).toHaveLength(3);
     });
     it("should return error message if not admin user", async () => {
         const compositionRoot = getTestCompositionRoot(false);
 
-        try {
-            await compositionRoot.dataElements.getAll.execute().toPromise();
-        } catch (err: any) {
-            expect(err.message).toBe("User is not admin");
-        }
+        const promise = compositionRoot.dataElements.getAll.execute().toPromise();
+
+        await expect(promise).rejects.toThrow(new Error("User is not admin"));
     });
 });
