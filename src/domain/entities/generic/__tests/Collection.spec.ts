@@ -333,4 +333,10 @@ describe("Collection", () => {
         expect(hashMap.get(2)).toEqual("1");
         expect(hashMap.get(4)).toEqual("2");
     });
+
+    test("indexOf", () => {
+        const values = _(["a", "b", "c", "d", "e"]);
+        expect(values.indexOf("a")).toEqual(0);
+        expect(values.indexOf("e")).toEqual(4);
+    });
 });

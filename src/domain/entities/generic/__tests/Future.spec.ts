@@ -84,6 +84,13 @@ describe("Transformations", () => {
         await expectAsync(value2$, { toThrow: "1" });
     });
 
+    test("isomap", async () => {
+        const n1$ = Future.success(1);
+        const n2$ = n1$.isomap(n => n + 1);
+
+        await expectAsync(n2$, { toEqual: 2 });
+    });
+
     describe("flatMap/chain", () => {
         it("builds an async value mapping to another async", async () => {
             const value$ = Future.success(1)
