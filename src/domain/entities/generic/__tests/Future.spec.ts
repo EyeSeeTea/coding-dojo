@@ -2,6 +2,14 @@ import { describe, expect, test, it, vi, expectTypeOf } from "vitest";
 import { Future } from "../Future";
 
 describe("Basic builders", () => {
+    test.only("Future.isomap", async () => {
+        const f2$ = Future.success(1);
+        const f2Number$ = f2$.isomap(n => n + 1);
+
+        expectTypeOf(f2Number$).toEqualTypeOf<Future<unknown, number>>();
+        await expectAsync(f2Number$, { toEqual: 2 });
+    });
+
     test("Future.success", async () => {
         const value$ = Future.success(10);
 

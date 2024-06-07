@@ -13,6 +13,10 @@ import { Cancellation } from "real-cancellable-promise";
 export class Future<E, D> {
     private constructor(private _promise: () => rcpromise.CancellablePromise<D>) {}
 
+    isomap(fn: (data: D) => D): Future<E, D> {
+        return new Future(() => this._promise().then(fn));
+    }
+
     static success<E, D>(data: D): Future<E, D> {
         return new Future(() => rcpromise.CancellablePromise.resolve(data));
     }

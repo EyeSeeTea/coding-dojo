@@ -1,3 +1,4 @@
+import { Maybe } from "../../../utils/ts-utils";
 import { HashMap } from "./HashMap";
 
 /**
@@ -269,6 +270,11 @@ export class Collection<T> {
             .map(i => [this.xs[i], xs.xs[i]] as [T, S])
             .value();
         return _c(pairs);
+    }
+
+    indexOf(value: T): Maybe<number> {
+        const index = this.xs.findIndex(x => x === value);
+        return index !== -1 ? index : undefined;
     }
 
     /* Methods that return HashMap */

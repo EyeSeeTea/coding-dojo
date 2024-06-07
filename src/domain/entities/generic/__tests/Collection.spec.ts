@@ -3,6 +3,17 @@ import _, { Collection } from "../Collection";
 import { expectTypeOf } from "expect-type";
 
 describe("Collection", () => {
+    test.only("indexOf", () => {
+        const indexOne = _(["a", "b", "c"]).indexOf("b");
+        expect(indexOne).toEqual(1);
+
+        const indexUndefined = _(["a", "b", "c"]).indexOf("d");
+        expect(indexUndefined).toBeUndefined();
+
+        const indexNumber = _([1, 2, 3]).indexOf(1);
+        expect(indexNumber).toBe(0);
+    });
+
     test("range", () => {
         expect(Collection.range(2, 5).toArray()).toEqual([2, 3, 4]);
         expect(Collection.range(2, -1).toArray()).toEqual([]);
