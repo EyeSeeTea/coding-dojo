@@ -1,10 +1,10 @@
 {
-    "name": "typescript-kata-template",
+    "name": "openai-cli",
     "version": "1.0.0",
-    "description": "Typescript template for katas",
+    "description": "Command-line interface to interact with OpenAI's JavaScript/TypeScript API",
     "main": "./build/index.js",
-    "author": "xurxodev",
-    "license": "MIT",
+    "author": "EyeSeeTea team",
+    "license": "AGPL-3.0-only",
     "scripts": {
         "tsc": "tsc --build",
         "clean": "rm -rf build",
