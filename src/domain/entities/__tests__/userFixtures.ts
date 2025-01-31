@@ -1,4 +1,4 @@
-import { User, UserRole } from "../User";
+import { ManagerAuthority, User, UserRole } from "../User";
 import { NamedRef } from "../Ref";
 
 export function createAdminUser(): User {
@@ -11,6 +11,13 @@ export function createNonAdminUser(): User {
 
     return createUser(nonAdminRoles, []);
 }
+
+export function createManager(): User {
+    const adminRoles = [{ id: "Hg7n0MwzUQn", name: "Super user", authorities: [ManagerAuthority] }];
+
+    return createUser(adminRoles, []);
+}
+
 export function createUserWithGroups(userGroups: NamedRef[] = []): User {
     return new User({
         id: "YjJdEO6d38H",

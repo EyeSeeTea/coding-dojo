@@ -13,6 +13,8 @@ export interface UserRole extends NamedRef {
     authorities: string[];
 }
 
+export const ManagerAuthority = "MANAGER";
+
 export class User extends Struct<UserAttrs>() {
     belongToUserGroup(userGroupUid: string): boolean {
         return this.userGroups.some(({ id }) => id === userGroupUid);
@@ -20,5 +22,9 @@ export class User extends Struct<UserAttrs>() {
 
     isAdmin(): boolean {
         return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
+    }
+
+    isManager(): boolean {
+        return this.userRoles.some(({ authorities }) => authorities.includes(ManagerAuthority));
     }
 }
