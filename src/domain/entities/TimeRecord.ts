@@ -1,6 +1,5 @@
 import { Struct } from "./generic/Struct";
 import { Id } from "./Ref";
-import { FutureData } from "../../data/api-futures";
 
 export const approvedStatus = "APPROVED";
 export const rejectedStatus = "REJECTED";
@@ -22,9 +21,6 @@ export interface TimeRecordAttrs {
 }
 
 export class TimeRecord extends Struct<TimeRecordAttrs>() {
-    isApproved() {
-        return this.status === approvedStatus;
-    }
     isPending() {
         return this.status === pendingStatus;
     }
@@ -38,18 +34,4 @@ export class TimeRecord extends Struct<TimeRecordAttrs>() {
             dateStatusUpdate: new Date(),
         });
     }
-}
-
-export type GetTimeRecordOptions = {
-    managerId?: Id;
-    Ids?: Id[];
-    startDate?: Date;
-    endDate?: Date;
-    status?: TimeRecordStatus;
-};
-
-export interface TimeRecordRepository {
-    get(options: GetTimeRecordOptions): FutureData<TimeRecord[]>;
-    getById(timeRecordId: Id): FutureData<TimeRecord[]>;
-    save(timeRecord: TimeRecord): FutureData<TimeRecord>;
 }

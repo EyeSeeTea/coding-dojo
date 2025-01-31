@@ -1,11 +1,14 @@
-import { TimeRecord, TimeRecordRepository } from "../entities/TimeRecord";
-import { Manager, ManagerRepository } from "../entities/Manager";
-import { NotificationMessage, NotificationRepository } from "../entities/NotificationMessage";
+import { TimeRecord } from "../entities/TimeRecord";
+import { Manager } from "../entities/Manager";
+import { NotificationMessage } from "../entities/NotificationMessage";
 import { Id } from "../entities/Ref";
 import _c from "../entities/generic/Collection";
 import { FutureData } from "../../data/api-futures";
 import { Future } from "../entities/generic/Future";
 import { HashMap } from "../entities/generic/HashMap";
+import { TimeRecordRepository } from "../repositories/TimeRecordRepository";
+import { ManagerRepository } from "../repositories/ManagerRepository";
+import { NotificationRepository } from "../repositories/NotificationRepository";
 
 const concurrency = 10;
 
@@ -17,7 +20,8 @@ export class ApproveTimeRecordUseCase {
     ) {}
 
     execute(timeRecordIds: Id[]): FutureData<void> {
-        return this.timeRecordRepository.get({ Ids: timeRecordIds })
+        return this.timeRecordRepository
+            .get({ Ids: timeRecordIds })
             .flatMap(records => this.approveAndSave(records))
             .flatMap(this.sendNotificationsToManagers);
     }

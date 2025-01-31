@@ -1,4 +1,4 @@
-import { GetManagerOptions, ManagerRepository } from "../entities/Manager";
+import { GetManagerOptions, ManagerRepository } from "../repositories/ManagerRepository";
 
 export class GetManagersUseCase {
     constructor(private managerRepository: ManagerRepository) {}

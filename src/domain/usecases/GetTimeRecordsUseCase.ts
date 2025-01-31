@@ -1,4 +1,4 @@
-import { GetTimeRecordOptions, TimeRecordRepository } from "../entities/TimeRecord";
+import { GetTimeRecordOptions, TimeRecordRepository } from "../repositories/TimeRecordRepository";
 
 export class GetTimeRecordsUseCase {
     constructor(private timeRecordRepository: TimeRecordRepository) {}

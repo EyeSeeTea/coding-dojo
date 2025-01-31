@@ -1,4 +1,3 @@
-import { FutureData } from "../../data/api-futures";
 import { Struct } from "./generic/Struct";
 
 export type NotificationMessageAtts = {
@@ -7,8 +6,3 @@ export type NotificationMessageAtts = {
     title: string;
 };
 export class NotificationMessage extends Struct<NotificationMessageAtts>() {}
-
-export interface NotificationRepository {
-    save(notification: NotificationMessage): FutureData<NotificationMessage>;
-    send(notification: NotificationMessage): FutureData<void>;
-}
