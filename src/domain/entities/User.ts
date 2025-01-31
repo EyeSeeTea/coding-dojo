@@ -13,7 +13,7 @@ export interface UserRole extends NamedRef {
     authorities: string[];
 }
 
-const ManagerAuthority = "MANAGER";
+export const ManagerAuthority = "MANAGER";
 
 export class User extends Struct<UserAttrs>() {
     belongToUserGroup(userGroupUid: string): boolean {

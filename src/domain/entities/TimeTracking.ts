@@ -13,13 +13,13 @@ interface TimeTrackingAttrs extends NamedRef {
 }
 
 export class TimeTracking extends Struct<TimeTrackingAttrs>() {
-    validate(data: TimeTrackingAttrs): Error[] {
+    validate(): Error[] {
         const errors: Error[] = [];
-        if (data.hours <= 0) {
+        if (this.hours <= 0) {
             errors.push(new Error("Hours must be greater than 0"));
-        } else if (data.hours >= 24) {
+        } else if (this.hours >= 24) {
             errors.push(new Error("Hours must be less than 24"));
-        } else if (!data.manager.isManager()) {
+        } else if (!this.manager.isManager()) {
             errors.push(new Error("Only managers can create time tracking entries"));
         }
         return errors;
