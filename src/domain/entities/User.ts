@@ -21,4 +21,10 @@ export class User extends Struct<UserAttrs>() {
     isAdmin(): boolean {
         return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
     }
+
+    isTimeTrackingApprover(): boolean {
+        return this.userRoles.some(({ authorities }) =>
+            authorities.includes("TIME_TRACKING_APPROVER")
+        );
+    }
 }
