@@ -21,4 +21,8 @@ export class User extends Struct<UserAttrs>() {
     isAdmin(): boolean {
         return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
     }
+
+    hasApprovalPermissions(): boolean {
+        return this.userRoles.some(({ authorities }) => authorities.includes("ALL"));
+    }
 }
