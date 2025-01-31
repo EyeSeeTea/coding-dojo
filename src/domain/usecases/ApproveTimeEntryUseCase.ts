@@ -1,10 +1,10 @@
 import { FutureData } from "../../data/api-futures";
-import { TimeEntry, TimeEntryApprovalStatus } from "../entities/TimeEntry";
+import { Notification } from "../entities/Notification";
+import { TimeEntry } from "../entities/TimeEntry";
 import { User } from "../entities/User";
 import { ManagerRepository } from "../repositories/ManagerRepository";
 import { NotificationRepository } from "../repositories/NotificationRepository";
 import { TimeEntryRepository } from "../repositories/TimeEntryRepository";
-import { SendTimeEntryStatusChangeNotificationUseCase } from "./SendTimeEntryStatusChangeNotificationUseCase";
 
 export class ApproveTimeEntryUseCase {
     constructor(
@@ -14,17 +14,17 @@ export class ApproveTimeEntryUseCase {
     ) {}
 
     public execute(timeEntry: TimeEntry, approver: User): FutureData<void> {
-        const sendNotificationUseCase = new SendTimeEntryStatusChangeNotificationUseCase(
-            this.notificationRepository,
-            this.managerRepository
-        );
-        const timeEntryUpdated: TimeEntry = {
-            ...timeEntry,
-            approvalStatus: TimeEntryApprovalStatus.Approved,
-            approver,
+        timeEntry.approve(approver);
+
+        const notification: Notification = {
+            title: "Time entry status change",
+            message: `Time entry ${timeEntry.id} status changed to ${timeEntry.approvalStatus}`,
         };
-        return this.timeEntryRepository
-            .update(timeEntryUpdated)
-            .flatMap(() => sendNotificationUseCase.execute(timeEntryUpdated));
+
+        return this.timeEntryRepository.update(timeEntry).flatMap(() =>
+            this.managerRepository.getById(timeEntry.managerId).flatMap(manager => {
+                return this.notificationRepository.send(notification, manager);
+            })
+        );
     }
 }

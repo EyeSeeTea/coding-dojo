@@ -1,5 +1,5 @@
 import { Day } from "./Day";
-import { Manager } from "./Manager";
+import { Struct } from "./generic/Struct";
 import { Id, Ref } from "./Ref";
 import { User } from "./User";
 
@@ -9,23 +9,18 @@ export enum TimeEntryApprovalStatus {
     Pending = "pending",
 }
 
-interface TimeEntryBase extends Ref {
+interface TimeEntryAttrs extends Ref {
     day: Day;
     hours: number;
     description: string;
     managerId: Id;
+    approvalStatus: TimeEntryApprovalStatus;
+    approver: User | null;
 }
 
-interface PendingTimeEntry extends TimeEntryBase {
-    approvalStatus: TimeEntryApprovalStatus.Pending;
-    approver: null;
+export class TimeEntry extends Struct<TimeEntryAttrs>() {
+    approve(approver: User) {
+        this.approvalStatus = TimeEntryApprovalStatus.Approved;
+        this.approver = approver;
+    }
 }
-
-interface ReviewedTimeEntry extends TimeEntryBase {
-    approvalStatus: TimeEntryApprovalStatus.Approved | TimeEntryApprovalStatus.Rejected;
-    approver: User;
-}
-
-export type TimeEntry = PendingTimeEntry | ReviewedTimeEntry;
-
-export type TimeEntryWithManager = TimeEntry & { manager: Manager };

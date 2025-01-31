@@ -5,14 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-01-31T09:21:49.109Z\n"
-"PO-Revision-Date: 2025-01-31T09:21:49.109Z\n"
-
-msgid "Time entry status change"
-msgstr ""
-
-msgid "Time entry {{timeEntryId}} status changed to {{timeEntryStatus}}"
-msgstr ""
+"POT-Creation-Date: 2025-01-31T12:09:26.917Z\n"
+"PO-Revision-Date: 2025-01-31T12:09:26.917Z\n"
 
 msgid "Add"
 msgstr ""
