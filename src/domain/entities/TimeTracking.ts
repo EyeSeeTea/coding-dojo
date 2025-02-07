@@ -7,9 +7,12 @@ export interface TimeTrackingAttributes extends Ref {
     hours: number;
     description: string;
     approved: boolean;
+    orgUnitId: Id;
 }
 
 export class TimeTracking extends Struct<TimeTrackingAttributes>() {
+    // TODO: Validate hours should be non negative
+
     approve(): TimeTracking {
         return this._update({ approved: true });
     }

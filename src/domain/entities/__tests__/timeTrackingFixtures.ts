@@ -8,6 +8,7 @@ export function givenATimeTracking(approved: boolean): TimeTracking {
         hours: 1,
         description: `description`,
         approved: approved,
+        orgUnitId: `org-unit-id`,
     });
 
     return timeTracking;
@@ -22,6 +23,7 @@ export function givenTimeTrackings(total: number, approved: boolean): TimeTracki
             hours: index,
             description: `description-${index}`,
             approved: approved,
+            orgUnitId: `org-unit-id-${index}`,
         });
     });
 }

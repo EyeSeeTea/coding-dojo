@@ -6,6 +6,7 @@ export function givenAManager(): Manager {
         name: `Manager`,
         userId: `user-id`,
         email: `manager@email.com`,
+        orgUnitId: `org-unit-id`,
     };
 
     return manager;
@@ -18,6 +19,7 @@ export function givenManagers(total: number): Manager[] {
             name: `Manager ${index}`,
             userId: `user-id-${index}`,
             email: `manager${index}@email.com`,
+            orgUnitId: `org-unit-id-${index}`,
         };
 
         return manager;
