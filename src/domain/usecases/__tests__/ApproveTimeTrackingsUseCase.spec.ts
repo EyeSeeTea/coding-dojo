@@ -40,9 +40,9 @@ describe("ApproveTimeTrackingsUseCase", () => {
 });
 
 function givenApproveTimeTrackingsUseCase() {
-    return new ApproveTimeTrackingsUseCase(
-        new NotApprovedTimeTrackingTestRepository(),
-        new ManagerTestRepository(),
-        new NotificationTestRepository()
-    );
+    return new ApproveTimeTrackingsUseCase({
+        timeTrackingReposiory: new NotApprovedTimeTrackingTestRepository(),
+        managerRepository: new ManagerTestRepository(),
+        notificationRepository: new NotificationTestRepository(),
+    });
 }

@@ -12,9 +12,11 @@ import { TimeTrackingRepository } from "../repositories/TimeTrackingRepository";
 
 export class ApproveTimeTrackingsUseCase {
     constructor(
-        private timeTrackingReposiory: TimeTrackingRepository,
-        private managerRepository: ManagerRepository,
-        private notificationRepository: NotificationRepository
+        private repositories: {
+            timeTrackingReposiory: TimeTrackingRepository;
+            managerRepository: ManagerRepository;
+            notificationRepository: NotificationRepository;
+        }
     ) {}
 
     public execute(currentUser: User, timeTrackingIdsToApprove: Id[]): FutureData<void> {
@@ -22,7 +24,7 @@ export class ApproveTimeTrackingsUseCase {
             return Future.error(new Error("You don't have permission to approve time trackings"));
         }
 
-        return this.timeTrackingReposiory
+        return this.repositories.timeTrackingReposiory
             .get({
                 timeTrackingIds: timeTrackingIdsToApprove,
             })
@@ -31,9 +33,11 @@ export class ApproveTimeTrackingsUseCase {
                     timeTrackingToApprove.approve()
                 );
 
-                return this.timeTrackingReposiory.save(approvedTimeTrackings).flatMap(() => {
-                    return this.sendNotificationsToManagers(approvedTimeTrackings);
-                });
+                return this.repositories.timeTrackingReposiory
+                    .save(approvedTimeTrackings)
+                    .flatMap(() => {
+                        return this.sendNotificationsToManagers(approvedTimeTrackings);
+                    });
             });
     }
 
@@ -44,7 +48,7 @@ export class ApproveTimeTrackingsUseCase {
             .uniq()
             .toArray();
 
-        return this.managerRepository
+        return this.repositories.managerRepository
             .get({
                 managerIds: uniqManagerIdsToSendNotification,
             })
@@ -68,7 +72,7 @@ export class ApproveTimeTrackingsUseCase {
 
                 return Future.parallel(
                     notifications.map(notification =>
-                        this.notificationRepository.send(notification)
+                        this.repositories.notificationRepository.send(notification)
                     ),
                     { concurrency: 5 }
                 ).flatMap(() => {
