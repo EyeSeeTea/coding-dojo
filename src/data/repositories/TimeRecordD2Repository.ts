@@ -1,18 +1,12 @@
 import { D2Api } from "../../types/d2-api";
 import { apiToFuture, FutureData } from "../api-futures";
-import { Manager } from "../../domain/entities/Manager";
 import { arrayToObject, Maybe } from "../../utils/ts-utils";
 import {
     GetTimeRecordOptions,
     TimeRecordRepository,
 } from "../../domain/repositories/TimeRecordRepository";
 import { D2TrackerEvent } from "@eyeseetea/d2-api/api/trackerEvents";
-import {
-    pendingStatus,
-    TimeRecord,
-    TimeRecordAttrs,
-    TimeRecordStatus,
-} from "../../domain/entities/TimeRecord";
+import { pendingStatus, TimeRecord, TimeRecordStatus } from "../../domain/entities/TimeRecord";
 import { timeTrackerProgram } from "./ManagerD2Repository";
 import { Future } from "../../domain/entities/generic/Future";
 
