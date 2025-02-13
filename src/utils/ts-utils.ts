@@ -74,3 +74,16 @@ export function recordOf<T>() {
 export function assertUnreachable(value: never, message = `Invalid union value: ${value}`) {
     throw new Error(message);
 }
+
+export function arrayToObject<T extends Record<string, any>, K extends keyof T>(
+    array: T[],
+    key: K
+): Record<string | number, T> {
+    return array.reduce(
+        (acc, item) => ({
+            ...acc,
+            [item[key]]: item,
+        }),
+        {} as Record<string | number, T>
+    );
+}

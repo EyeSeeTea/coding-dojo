@@ -4,8 +4,9 @@ import { Id } from "./Ref";
 export const approvedStatus = "APPROVED";
 export const rejectedStatus = "REJECTED";
 export const pendingStatus = "PENDING";
+const timeRecordStatuses = [approvedStatus, rejectedStatus, pendingStatus] as const;
 
-export type TimeRecordStatus = typeof approvedStatus | typeof rejectedStatus | typeof pendingStatus;
+export type TimeRecordStatus = (typeof timeRecordStatuses)[number];
 
 export interface TimeRecordAttrs {
     id: Id;
