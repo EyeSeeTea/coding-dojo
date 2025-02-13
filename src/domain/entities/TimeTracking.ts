@@ -1,3 +1,4 @@
+import { Either } from "./generic/Either";
 import { Struct } from "./generic/Struct";
 
 type Day = {
@@ -15,7 +16,11 @@ export type TimeTrackingAttrs = {
 };
 
 export class TimeTracking extends Struct<TimeTrackingAttrs>() {
-    //TODO: Add required validations if exists
+    static validate(attrs: TimeTrackingAttrs) {
+        if (!attrs.id) return Either.error(new Error("id is required"));
+
+        return Either.success(attrs);
+    }
 
     approve(): TimeTracking {
         return this._update({ approved: true });
