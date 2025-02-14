@@ -1,7 +1,6 @@
 import { Day } from "./Day";
 import { Struct } from "./generic/Struct";
 import { Id, Ref } from "./Ref";
-import { User } from "./User";
 
 export enum TimeEntryApprovalStatus {
     Approved = "approved",
@@ -15,12 +14,11 @@ interface TimeEntryAttrs extends Ref {
     description: string;
     managerId: Id;
     approvalStatus: TimeEntryApprovalStatus;
-    approver: User | null;
+    approverId: Id | null;
 }
 
 export class TimeEntry extends Struct<TimeEntryAttrs>() {
-    approve(approver: User) {
-        this.approvalStatus = TimeEntryApprovalStatus.Approved;
-        this.approver = approver;
+    approve(approverId: Id): TimeEntry {
+        return this._update({ approvalStatus: TimeEntryApprovalStatus.Approved, approverId });
     }
 }

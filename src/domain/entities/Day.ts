@@ -17,6 +17,18 @@ export class Day {
         return this.toDate().toISOString().slice(0, 10);
     }
 
+    public static fromString(string: string): Day {
+        const result = /^(\d{4})-(\d{2})-(\d{2})$/.exec(string);
+        if (!result) {
+            throw new Error("Invalid date string");
+        }
+        const [year, month, day] = result.slice(1).map(section => Number(section));
+        if (year === undefined || month === undefined || day === undefined) {
+            throw new Error("Invalid date string");
+        }
+        return new Day(year, month, day);
+    }
+
     private isValid(): boolean {
         const date = this.toDate();
         return (

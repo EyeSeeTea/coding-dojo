@@ -1,30 +1,33 @@
 import { FutureData } from "../../data/api-futures";
 import { Notification } from "../entities/Notification";
 import { TimeEntry } from "../entities/TimeEntry";
-import { User } from "../entities/User";
 import { ManagerRepository } from "../repositories/ManagerRepository";
 import { NotificationRepository } from "../repositories/NotificationRepository";
 import { TimeEntryRepository } from "../repositories/TimeEntryRepository";
+import { UserRepository } from "../repositories/UserRepository";
 
 export class ApproveTimeEntryUseCase {
     constructor(
         private timeEntryRepository: TimeEntryRepository,
         private notificationRepository: NotificationRepository,
-        private managerRepository: ManagerRepository
+        private managerRepository: ManagerRepository,
+        private userRepository: UserRepository
     ) {}
 
-    public execute(timeEntry: TimeEntry, approver: User): FutureData<void> {
-        timeEntry.approve(approver);
+    public execute(timeEntry: TimeEntry): FutureData<void> {
+        return this.userRepository.getCurrent().flatMap(approver => {
+            const approvedTimeEntry = timeEntry.approve(approver.id);
 
-        const notification: Notification = {
-            title: "Time entry status change",
-            message: `Time entry ${timeEntry.id} status changed to ${timeEntry.approvalStatus}`,
-        };
+            const notification: Notification = {
+                title: "Time entry approved",
+                message: `Time entry ${approvedTimeEntry.id} status changed to ${approvedTimeEntry.approvalStatus}`,
+            };
 
-        return this.timeEntryRepository.update(timeEntry).flatMap(() =>
-            this.managerRepository.getById(timeEntry.managerId).flatMap(manager => {
-                return this.notificationRepository.send(notification, manager);
-            })
-        );
+            return this.timeEntryRepository.update(approvedTimeEntry).flatMap(() =>
+                this.managerRepository.getById(approvedTimeEntry.managerId).flatMap(manager => {
+                    return this.notificationRepository.send(notification, manager);
+                })
+            );
+        });
     }
 }
