@@ -1,3 +1,4 @@
+import { Id } from "../../domain/entities/Ref";
 import { User } from "../../domain/entities/User";
 import { UserRepository } from "../../domain/repositories/UserRepository";
 import { D2Api, MetadataPick } from "../../types/d2-api";
@@ -10,6 +11,18 @@ export class UserD2Repository implements UserRepository {
         return apiToFuture(
             this.api.currentUser.get({
                 fields: userFields,
+            })
+        ).map(d2User => {
+            const res = this.buildUser(d2User);
+            return res;
+        });
+    }
+
+    public getManager(managerId: Id): FutureData<User> {
+        return apiToFuture(
+            this.api.currentUser.get({
+                fields: userFields,
+                filter: { id: { eq: managerId } },
             })
         ).map(d2User => {
             const res = this.buildUser(d2User);
