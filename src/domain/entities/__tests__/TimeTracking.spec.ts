@@ -12,6 +12,7 @@ describe("TimeTracking", () => {
             hours: 5,
             description: "description",
             approvalStatus: "APPROVED",
+            managerId: "M1",
             manager: createManager(),
         });
 
@@ -25,6 +26,7 @@ describe("TimeTracking", () => {
             hours: -1,
             description: "description",
             approvalStatus: "APPROVED",
+            managerId: "M1",
             manager: createManager(),
         });
 
@@ -38,6 +40,7 @@ describe("TimeTracking", () => {
             hours: 35,
             description: "description",
             approvalStatus: "APPROVED",
+            managerId: "M1",
             manager: createManager(),
         });
 
@@ -51,6 +54,7 @@ describe("TimeTracking", () => {
             hours: 5,
             description: "description",
             approvalStatus: "APPROVED",
+            managerId: "M1",
             manager: createNonAdminUser(),
         });
 
@@ -65,6 +69,7 @@ describe("TimeTracking", () => {
             hours: 35,
             description: "description",
             approvalStatus: "APPROVED",
+            managerId: "M1",
             manager: createNonAdminUser(),
         });
 

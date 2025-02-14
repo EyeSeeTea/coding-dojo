@@ -1,14 +1,20 @@
+import { Maybe } from "../../utils/ts-utils";
 import { Struct } from "./generic/Struct";
-import { NamedRef } from "./Ref";
+import { Id, NamedRef } from "./Ref";
 import { User } from "./User";
 
-export type ApprovalStatuses = "APPROVED" | "REJECTED" | "PENDING";
+export const approvalStatuses = ["APPROVED", "REJECTED", "PENDING"] as const;
+export type ApprovalStatuses = (typeof approvalStatuses)[number];
 
-interface TimeTrackingAttrs extends NamedRef {
+export interface TimeTrackingBaseAttrs extends NamedRef {
     date: Date;
     hours: number;
-    description: string;
+    description: Maybe<string>;
     approvalStatus: ApprovalStatuses;
+    managerId: Id;
+}
+
+interface TimeTrackingAttrs extends TimeTrackingBaseAttrs {
     manager: User;
 }
 
