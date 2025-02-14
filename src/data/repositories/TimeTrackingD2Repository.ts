@@ -8,9 +8,9 @@ import {
 } from "../consts/TimeTrackingConstants";
 import { D2TrackerEvent } from "@eyeseetea/d2-api/api/trackerEvents";
 import { Future } from "../../domain/entities/generic/Future";
-import { Maybe } from "../../utils/ts-utils";
+import { isValueInUnionType, Maybe } from "../../utils/ts-utils";
 
-type ApprovalStatus = "APPROVED" | "REJECTED";
+const approvalStatus = ["APPROVED", "REJECTED"] as const;
 
 export class TimeTrackingD2Repository implements TimeTrackingRepository {
     constructor(private api: D2Api) {}
@@ -78,20 +78,15 @@ export class TimeTrackingD2Repository implements TimeTrackingRepository {
         const { event, dataValues } = timeTrackingEvent;
 
         const day = getEventDataValue(dataValues, TIME_TRACKING_DAY_DATA_VALUE_ID);
-        const month = dataValues.find(
-            dataValue => dataValue.dataElement === TIME_TRACKING_MONTH_DATA_VALUE_ID
-        )?.value;
-        const year = dataValues.find(
-            dataValue => dataValue.dataElement === TIME_TRACKING_YEAR_DATA_VALUE_ID
-        )?.value;
-        const description = dataValues.find(
-            dataValue => dataValue.dataElement === TIME_TRACKING_DESCRIPTION_DATA_VALUE_ID
-        )?.value;
-        const approvalStatus = dataValues.find(
-            dataValue => dataValue.dataElement === TIME_TRACKING_APPROVAL_STATUS_DATA_VALUE_ID
-        )?.value as ApprovalStatus;
+        const month = getEventDataValue(dataValues, TIME_TRACKING_MONTH_DATA_VALUE_ID);
+        const year = getEventDataValue(dataValues, TIME_TRACKING_YEAR_DATA_VALUE_ID);
+        const description = getEventDataValue(dataValues, TIME_TRACKING_DESCRIPTION_DATA_VALUE_ID);
+        const approved = isValueInUnionType(
+            getEventDataValue(dataValues, TIME_TRACKING_APPROVAL_STATUS_DATA_VALUE_ID),
+            approvalStatus
+        );
 
-        if (!day || !month || !year || !description || approvalStatus === undefined)
+        if (!day || !month || !year || !description)
             return Future.error(new Error("Time tracking data is incomplete."));
 
         return Future.success(
@@ -104,7 +99,7 @@ export class TimeTrackingD2Repository implements TimeTrackingRepository {
                     year: parseInt(year),
                 },
                 description: description,
-                approved: approvalStatus === "APPROVED",
+                approved: approved,
             })
         );
     }
