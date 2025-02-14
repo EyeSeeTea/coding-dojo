@@ -18,14 +18,7 @@ export class ManagerD2Repository implements ManagerRepository {
         return apiToFuture(
             this.api.tracker.trackedEntities.get({
                 trackedEntity: options.Ids?.join(";"),
-                fields: {
-                    trackedEntity: true,
-                    attributes: {
-                        attribute: true,
-                        valueType: true,
-                        value: true,
-                    },
-                },
+                fields: teiManagerFields,
                 filter: buildTrackerEntityFilter(options),
                 program: timeTrackerProgram,
                 enrollmentEnrolledBefore: new Date().toISOString(),
@@ -35,7 +28,30 @@ export class ManagerD2Repository implements ManagerRepository {
             return response.instances.map(mapTrackedEntityToManager);
         });
     }
+    getById(id: string): FutureData<Manager> {
+        return apiToFuture(
+            this.api.tracker.trackedEntities.get({
+                trackedEntity: id,
+                fields: teiManagerFields,
+                program: timeTrackerProgram,
+                enrollmentEnrolledBefore: new Date().toISOString(),
+                pageSize: 1,
+            })
+        ).map(response => {
+            const instance = response.instances?.[0];
+            return mapTrackedEntityToManager(instance || {});
+        });
+    }
 }
+
+const teiManagerFields = {
+    trackedEntity: true,
+    attributes: {
+        attribute: true,
+        valueType: true,
+        value: true,
+    },
+} as const;
 
 function buildTrackerEntityFilter(options: GetManagerOptions): string {
     const splitName = options.name?.split(" ") || [];
@@ -47,8 +63,9 @@ function buildTrackerEntityFilter(options: GetManagerOptions): string {
 }
 
 function mapTrackedEntityToManager(trackedEntity: D2TrackerTrackedEntity): Manager {
-    const attributes =
-        trackedEntity.attributes && arrayToObject(trackedEntity.attributes, "attribute");
+    const attributes = trackedEntity.attributes
+        ? arrayToObject(trackedEntity.attributes, "attribute")
+        : {};
     return {
         id: trackedEntity.trackedEntity || "No id",
         firstName: attributes?.[firstName]?.value || "No first name",

@@ -12,5 +12,6 @@ export type GetTimeRecordOptions = {
 
 export interface TimeRecordRepository {
     get(options: GetTimeRecordOptions): FutureData<TimeRecord[]>;
+    getById(Id: string): FutureData<TimeRecord>;
     save(timeRecord: TimeRecord): FutureData<TimeRecord>;
 }

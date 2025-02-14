@@ -60,21 +60,26 @@ export class TimeRecordD2Repository implements TimeRecordRepository {
             this.api.tracker.events.get({
                 event: options.Ids?.join(";"),
                 trackedEntity: options.managerId,
-                fields: {
-                    event: true,
-                    trackedEntity: true,
-                    createdAt: true,
-                    dataValues: {
-                        dataElement: true,
-                        value: true,
-                    },
-                },
+                fields: eventTimeRecordFields,
                 filter: buildEventFilter(options),
                 programStage: timeRecordProgramStage,
                 pageSize: 100,
             })
         ).map(response => {
             return response.instances.map(mapEventToTimeRecord);
+        });
+    }
+    getById(Id: string): FutureData<TimeRecord> {
+        return apiToFuture(
+            this.api.tracker.events.get({
+                event: Id,
+                fields: eventTimeRecordFields,
+                programStage: timeRecordProgramStage,
+                pageSize: 1,
+            })
+        ).map(response => {
+            const instance = response.instances?.[0];
+            return mapEventToTimeRecord(instance || ({} as D2TrackerEvent));
         });
     }
     save(timeRecord: TimeRecord): FutureData<TimeRecord> {
@@ -101,9 +106,19 @@ export class TimeRecordD2Repository implements TimeRecordRepository {
     }
 }
 
+const eventTimeRecordFields = {
+    event: true,
+    trackedEntity: true,
+    createdAt: true,
+    dataValues: {
+        dataElement: true,
+        value: true,
+    },
+} as const;
+
 function mapEventToTimeRecord(event: D2TrackerEvent): TimeRecord {
-    const attributes = event.dataValues && arrayToObject(event.dataValues, "dataElement");
-    return TimeRecord.create({
+    const attributes = event.dataValues ? arrayToObject(event.dataValues, "dataElement") : {};
+    return {
         id: event.trackedEntity || "No id",
         description: attributes?.[description]?.value || "No description",
         status: (attributes?.[status]?.value as TimeRecordStatus) || pendingStatus,
@@ -113,7 +128,7 @@ function mapEventToTimeRecord(event: D2TrackerEvent): TimeRecord {
         dateCreated: stringToDate(event.createdAt),
         dateStatusUpdate: stringToDate(attributes?.[dateStatusUpdate]?.value),
         notes: attributes?.[notes]?.value || "No notes",
-    });
+    } as TimeRecord;
 }
 
 function stringToDate(date: Maybe<string>): Date {

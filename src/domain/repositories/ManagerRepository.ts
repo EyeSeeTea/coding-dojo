@@ -10,4 +10,5 @@ export type GetManagerOptions = {
 
 export interface ManagerRepository {
     get(options: GetManagerOptions): FutureData<Manager[]>;
+    getById(Id: string): FutureData<Manager>;
 }
