@@ -75,3 +75,16 @@ Check the example script, entry `"script-example"`in `package.json`->scripts and
 -   Requests to DHIS2 will be transparently proxied (see `vite.config.ts` -> `server.proxy`) from `http://localhost:8081/dhis2/xyz` to `${VITE_DHIS2_BASE_URL}/xyz`. This prevents CORS and cross-domain problems.
 
 -   You can use `.env` variables within the React app: `const value = import.meta.env.NAME;`
+
+# Coding dojo notes (phase 2)
+
+-   TODO:
+    -   paging
+    -   Filters (how to concat when generating string)
+    -   `MetadaPick` usage
+    -   setup metadata and e2e test
+        -   Create Manager Tracked entity with name and email attributes
+        -   Create Tracker program with a Program Stage
+        -   Configure Ids
+    -   sync error handling for `map` functions in repositories
+    -   TimeEntry.ApproverId dataElement is not needed and can be obtained from the event itself?
