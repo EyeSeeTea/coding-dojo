@@ -6,6 +6,13 @@ export function createAdminUser(): User {
 
     return createUser(adminRoles, []);
 }
+
+export function createUserWithApprovalPermissions(): User {
+    const approvalRoles = [{ id: "Hg7n0MwzUQn", name: "User", authorities: ["ALL"] }];
+
+    return createUser(approvalRoles, []);
+}
+
 export function createNonAdminUser(): User {
     const nonAdminRoles = [{ id: "Hg7n0MwzUQn", name: "Malaria", authorities: ["F_EXPORT_DATA"] }];
 
