@@ -7,7 +7,7 @@ export interface TimeTrackingAttributes extends Ref {
     hours: number;
     description: string;
     approved: boolean;
-    orgUnitId: Id;
+    orgUnitId: Id; // do not contaminate the domain entity with orgUnitId if it's not needed
 }
 
 export class TimeTracking extends Struct<TimeTrackingAttributes>() {

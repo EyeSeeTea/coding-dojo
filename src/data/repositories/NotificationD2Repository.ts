@@ -9,6 +9,7 @@ export class NotificationD2Repository implements NotificationRepository {
     send(notification: Notification): FutureData<void> {
         const { subject, message, userId } = notification;
 
+        // this.api.mail instead of using DHIS2 notifications
         return apiToFuture(
             this.api.messageConversations.post({
                 subject: subject,

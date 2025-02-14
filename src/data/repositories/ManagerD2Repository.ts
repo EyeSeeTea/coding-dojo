@@ -57,7 +57,7 @@ export class ManagerD2Repository implements ManagerRepository {
     private mapTrackedEntityToManager(trackedEntities: D2TrackerTrackedEntity): Manager {
         const { attributes, orgUnit, trackedEntity } = trackedEntities;
 
-        // QUESTION: how to throw an error if any of these fields are missing?
+        // QUESTION: how to throw an error if any of these fields are missing? --> change to use Futures and Future.error
         if (!attributes || !orgUnit || !trackedEntity) {
             throw new Error("Invalid tracked entity");
         }
@@ -66,7 +66,7 @@ export class ManagerD2Repository implements ManagerRepository {
         const email = getValueByAttributeIdFromAttributes(attributes, MANAGER_ATTRIBUTE_EMAIL_ID);
         const userId = getValueByAttributeIdFromAttributes(attributes, MANAGER_ATTRIBUTE_USER_ID);
 
-        // QUESTION: how to throw an error if any of these fields are missing?
+        // QUESTION: how to throw an error if any of these fields are missing? --> change to use Futures and Future.error
         if (!name || !email || !userId) {
             throw new Error("Invalid manager attributes");
         }

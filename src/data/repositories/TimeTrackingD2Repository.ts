@@ -41,6 +41,8 @@ export class TimeTrackingD2Repository implements TimeTrackingRepository {
         const trackerEvents: D2TrackerEvent[] = timeTrackings.map(timeTracking =>
             this.mapTimeTrackingToTrackedEntityEvent(timeTracking)
         );
+
+        // Get tracker entity to get OrgUnitId, do not contaminate the domain entity TimeTracking with orgUnitId
         return apiToFuture(
             this.api.tracker.post(
                 { importStrategy: "CREATE_AND_UPDATE" },
@@ -61,13 +63,13 @@ export class TimeTrackingD2Repository implements TimeTrackingRepository {
 
         const approved = trackerEvent.status === "COMPLETED";
 
-        // QUESTION: how to throw an error if any of these fields are missing?
+        // QUESTION: how to throw an error if any of these fields are missing? --> change to use Futures and Future.error
         if (!stringHours || !description || !trackerEvent.trackedEntity) {
             throw new Error("Invalid TimeTracking data");
         }
 
         // TODO: Validate hours should be non negative
-        return new TimeTracking({
+        return TimeTracking.create({
             id: trackerEvent.event,
             managerId: trackerEvent.trackedEntity,
             orgUnitId: trackerEvent.orgUnit,
