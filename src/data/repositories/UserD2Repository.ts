@@ -1,10 +1,14 @@
 import { User } from "../../domain/entities/User";
+import { Future } from "../../domain/entities/generic/Future";
 import { UserRepository } from "../../domain/repositories/UserRepository";
 import { D2Api, MetadataPick } from "../../types/d2-api";
 import { apiToFuture, FutureData } from "../api-futures";
 
 export class UserD2Repository implements UserRepository {
     constructor(private api: D2Api) {}
+    getByIds(_ids: string[]): FutureData<User[]> {
+        return Future.success([]);
+    }
 
     public getCurrent(): FutureData<User> {
         return apiToFuture(

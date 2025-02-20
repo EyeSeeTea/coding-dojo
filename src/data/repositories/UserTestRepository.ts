@@ -5,6 +5,9 @@ import { UserRepository } from "../../domain/repositories/UserRepository";
 import { FutureData } from "../api-futures";
 
 export class UserTestRepository implements UserRepository {
+    getByIds(_ids: string[]): FutureData<User[]> {
+        return Future.success([]);
+    }
     public getCurrent(): FutureData<User> {
         return Future.success(createAdminUser());
     }
