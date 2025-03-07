@@ -15,6 +15,7 @@ export function createUserWithGroups(userGroups: NamedRef[] = []): User {
     return new User({
         id: "YjJdEO6d38H",
         name: "John Traore",
+        email: "example@domain.com",
         username: "user",
         userRoles: [],
         userGroups,
@@ -24,6 +25,7 @@ function createUser(userRoles: UserRole[], userGroups: NamedRef[] = []): User {
     return new User({
         id: "kQiwoyMYHBS",
         name: "John Traore",
+        email: "example@domain.com",
         username: "user",
         userRoles,
         userGroups,

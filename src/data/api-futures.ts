@@ -18,3 +18,12 @@ export function apiToFuture<Data>(res: CancelableResponse<Data>): FutureData<Dat
         return res.cancel;
     });
 }
+
+export type Stat = "created" | "updated" | "deleted" | "error";
+
+export type Stats = {
+    created: number;
+    updated: number;
+    deleted: number;
+    error: number;
+};
