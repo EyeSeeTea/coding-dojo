@@ -66,10 +66,10 @@ function mapTrackedEntityToManager(trackedEntity: D2TrackerTrackedEntity): Manag
     const attributes = trackedEntity.attributes
         ? arrayToObject(trackedEntity.attributes, "attribute")
         : {};
-    return {
+    return Manager.create({
         id: trackedEntity.trackedEntity || "No id",
         firstName: attributes?.[firstName]?.value || "No first name",
         lastName: attributes?.[lastName]?.value || "No last name",
         email: attributes?.[email]?.value || "No email",
-    } as Manager;
+    });
 }

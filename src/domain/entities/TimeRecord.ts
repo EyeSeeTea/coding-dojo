@@ -35,4 +35,7 @@ export class TimeRecord extends Struct<TimeRecordAttrs>() {
             dateStatusUpdate: new Date(),
         });
     }
+    static approve(records: TimeRecord[]): TimeRecord[] {
+        return records.filter(r => r.isPending()).map(t => t.approve());
+    }
 }

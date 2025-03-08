@@ -19,7 +19,7 @@ export class ApproveTimeRecordUseCase {
         private notificationRepository: NotificationRepository
     ) {}
 
-    execute(timeRecordIds: Id[]): FutureData<void> {
+    execute({ timeRecordIds }: { timeRecordIds: Id[] }): FutureData<void> {
         return this.timeRecordRepository
             .get({ Ids: timeRecordIds })
             .flatMap(records => this.approveAndSave(records))
@@ -27,10 +27,13 @@ export class ApproveTimeRecordUseCase {
     }
 
     private approveAndSave(timeRecords: TimeRecord[]): FutureData<TimeRecord[]> {
-        const approvedTimeRecords = timeRecords.filter(r => r.isPending()).map(t => t.approve());
-        return Future.parallel(approvedTimeRecords.map(this.timeRecordRepository.save), {
-            concurrency,
-        });
+        const approvedTimeRecords = TimeRecord.approve(timeRecords);
+        return Future.parallel(
+            approvedTimeRecords.map(record => this.timeRecordRepository.save(record)),
+            {
+                concurrency,
+            }
+        );
     }
 
     private sendNotificationsToManagers(timeRecords: TimeRecord[]): FutureData<void> {

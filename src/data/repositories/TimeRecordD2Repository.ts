@@ -118,7 +118,7 @@ const eventTimeRecordFields = {
 
 function mapEventToTimeRecord(event: D2TrackerEvent): TimeRecord {
     const attributes = event.dataValues ? arrayToObject(event.dataValues, "dataElement") : {};
-    return {
+    return TimeRecord.create({
         id: event.trackedEntity || "No id",
         description: attributes?.[description]?.value || "No description",
         status: (attributes?.[status]?.value as TimeRecordStatus) || pendingStatus,
@@ -128,7 +128,7 @@ function mapEventToTimeRecord(event: D2TrackerEvent): TimeRecord {
         dateCreated: stringToDate(event.createdAt),
         dateStatusUpdate: stringToDate(attributes?.[dateStatusUpdate]?.value),
         notes: attributes?.[notes]?.value || "No notes",
-    } as TimeRecord;
+    });
 }
 
 function stringToDate(date: Maybe<string>): Date {
