@@ -1,3 +1,5 @@
+import _c from "../domain/entities/generic/Collection";
+
 export type Maybe<T> = T | undefined;
 
 export type Dictionary<T> = Record<string, T>;
@@ -73,4 +75,13 @@ export function recordOf<T>() {
 */
 export function assertUnreachable(value: never, message = `Invalid union value: ${value}`) {
     throw new Error(message);
+}
+
+export function arrayToObject<T extends Record<string, any>, K extends keyof T>(
+    array: T[],
+    key: K
+): Record<string | number, T> {
+    return _c(array)
+        .toHashMap<K, T>(a => [a[key], a])
+        .toObject();
 }
