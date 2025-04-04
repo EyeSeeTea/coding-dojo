@@ -2,7 +2,9 @@ import { expect, test } from "vitest";
 import { Either } from "../domain/entities/generic/Either";
 
 /*
-EXERCISE: refactor the function `getRequestFromString` so:
+EXERCISE: Beware of unsafe "as" castings.
+
+Refactor the function `getRequestFromString` so:
 
 1) The tests pass.
 2) It's 100% type-safe.
@@ -19,6 +21,8 @@ function getRequestFromString(value: string): Either<Error, Request> {
     const request = JSON.parse(value) as Request;
     return Either.success(request);
 }
+
+/* Tests */
 
 test("request with invalid status", () => {
     const requestE = getRequestFromString(`{"id": "123", "status": "WRONG"}`);
