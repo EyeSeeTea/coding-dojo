@@ -1,5 +1,7 @@
 import { expect, test } from "vitest";
 import { Either } from "../domain/entities/generic/Either";
+import { Codec, string, exactly, GetType } from "purify-ts";
+import { JsonFromString } from "purify-ts-extra-codec";
 
 /*
 EXERCISE: Beware of unsafe "as" castings.
@@ -10,16 +12,28 @@ Refactor the function `getRequestFromString` so:
 2) It's 100% type-safe.
 */
 
-export type Request = {
-    id: string;
-    status: RequestStatus;
-};
+// export type Request = {
+//     id: string;
+//     status: RequestStatus;
+// };
 
-type RequestStatus = "pending" | "success" | "error";
+// type RequestStatus = "pending" | "success" | "error";
+
+const requestCodec = Codec.interface({
+    id: string,
+    status: exactly("pending", "success", "error"),
+});
+
+// define the types based on the Codec to avoid duplication and two different sources of thruth
+export type Request = GetType<typeof requestCodec>;
 
 function getRequestFromString(value: string): Either<Error, Request> {
-    const request = JSON.parse(value) as Request;
-    return Either.success(request);
+    const result = JsonFromString(requestCodec).decode(value);
+    // We need to convert the purify-ts Either to our Either
+    return result
+        .mapLeft(error => Either.error<Error>(new Error(error))) // can use purify parseError but 'DecodeError' is not assignable to parameter of type 'Error'
+        .map(data => Either.success<Error, Request>(data))
+        .extract();
 }
 
 /* Tests */
