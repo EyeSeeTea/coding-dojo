@@ -1,3 +1,5 @@
+import { expect, test } from "vitest";
+
 /* Exercise: "as" castings can be safe (up-casting) or unsafe (down-casting) */
 
 export type Person = {
@@ -37,24 +39,33 @@ function buildUsernameFromPerson(person: Person): string {
     return `${person.name.toLowerCase()}${person.occupation.toLowerCase()}`;
 }
 
-// 1. Create valid users in the mapping
-const users1 = [person1, person2].map<User>(person => ({
-    ...person,
-    username: buildUsernameFromPerson(person),
-}));
-
-// 2. Convert person objects to user objects
-function toUser(person: Person): User {
-    if ("username" in person) return person as User;
-    return {
+test("1. Create valid users in the mapping", () => {
+    const users1 = [person1, person2].map<User>(person => ({
         ...person,
         username: buildUsernameFromPerson(person),
-    };
-}
-const users2 = [person1, person2].map<User>(toUser);
+    }));
 
-// 3. Check if the person is a user and return only valid users
-function isUser(person: Person): person is User {
-    return "username" in person;
-}
-const users3 = [person1, person2].filter(isUser);
+    expect(users1.every(user => "username" in user)).toBe(true);
+});
+
+test("2. Convert person objects to user objects", () => {
+    function toUser(person: Person): User {
+        if ("username" in person) return person as User;
+        return {
+            ...person,
+            username: buildUsernameFromPerson(person),
+        };
+    }
+    const users2 = [person1, person2].map<User>(toUser);
+
+    expect(users2.every(user => "username" in user)).toBe(true);
+});
+
+test("3. Check if the person is a user and return only valid users", () => {
+    function isUser(person: Person): person is User {
+        return "username" in person;
+    }
+    const users3 = [person1, person2, user].filter(isUser);
+
+    expect(users3).toEqual([user]);
+});

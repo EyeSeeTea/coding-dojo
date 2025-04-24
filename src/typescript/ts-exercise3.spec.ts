@@ -1,3 +1,5 @@
+import { expect, test } from "vitest";
+
 /*
 EXERCISE: when and how to use "satisfies"
 
@@ -22,3 +24,8 @@ export const config = {
     users: { url: "/api/users", limit: 10 },
     events: { url: "/api/events", limit: 20 },
 } satisfies Config;
+
+test("config should only contain keys of type 'users' or 'events'", () => {
+    const keys = Object.keys(config);
+    expect(keys).toEqual(["users", "events"]);
+});
