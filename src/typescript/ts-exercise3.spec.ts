@@ -56,3 +56,5 @@ export const configMoreRestrictive = {
 const _userUrlMoreRestrictive = configMoreRestrictive.users.url;
 // This is type "/api/events"
 const _eventUrlMoreRestrictive = configMoreRestrictive.events.url;
+
+test("", () => {});
