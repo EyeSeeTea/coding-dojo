@@ -17,9 +17,31 @@ export type Request = {
 
 type RequestStatus = "pending" | "success" | "error";
 
+function isRequestStatus(value: unknown): value is RequestStatus {
+    return (
+        typeof value === "string" &&
+        (value === "pending" || value === "success" || value === "error")
+    );
+}
+
+function isRequest(obj: unknown): obj is Request {
+    if (typeof obj !== "object" || obj === null) {
+        return false;
+    }
+
+    const hasIdProperty = "id" in obj && typeof obj.id === "string";
+    const hasRequestStatusProperty = "status" in obj && isRequestStatus(obj.status);
+
+    return hasIdProperty && hasRequestStatusProperty;
+}
+
 function getRequestFromString(value: string): Either<Error, Request> {
-    const request = JSON.parse(value) as Request;
-    return Either.success(request);
+    const parsedValue = JSON.parse(value);
+    if (isRequest(parsedValue)) {
+        return Either.success(parsedValue);
+    } else {
+        return Either.error(new Error("Invalid request"));
+    }
 }
 
 /* Tests */
