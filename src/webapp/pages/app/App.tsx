@@ -43,14 +43,14 @@ function App(props: AppProps) {
         <MuiThemeProvider theme={muiTheme}>
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <SnackbarProvider>
-                    <HeaderBar appName="Skeleton App" />
+                    {/*<HeaderBar appName="Skeleton App" />*/}
 
-                    {appConfig.feedback && appContext && (
-                        <Feedback
-                            options={appConfig.feedback}
-                            username={appContext.currentUser.username}
-                        />
-                    )}
+                    {/*{appConfig.feedback && appContext && (*/}
+                    {/*    <Feedback*/}
+                    {/*        options={appConfig.feedback}*/}
+                    {/*        username={appContext.currentUser.username}*/}
+                    {/*    />*/}
+                    {/*)}*/}
 
                     <div id="app" className="content">
                         <AppContext.Provider value={appContext}>
@@ -58,7 +58,7 @@ function App(props: AppProps) {
                         </AppContext.Provider>
                     </div>
 
-                    <Share visible={showShareButton} />
+                    {/*<Share visible={showShareButton} />*/}
                 </SnackbarProvider>
             </OldMuiThemeProvider>
         </MuiThemeProvider>

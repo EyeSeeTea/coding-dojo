@@ -5,6 +5,31 @@ import { D2Api } from "../../../types/d2-api";
 import App from "./App";
 import { CompositionRoot, getWebappCompositionRoot } from "../../../CompositionRoot";
 
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Tooltip,
+    Legend,
+    Title,
+} from "chart.js";
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Tooltip,
+    Legend,
+    Title
+);
+
 export function Dhis2App(_props: {}) {
     const [compositionRootRes, setCompositionRootRes] = React.useState<CompositionRootResult>({
         type: "loading",
